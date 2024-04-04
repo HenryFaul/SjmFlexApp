@@ -72,7 +72,6 @@ class InterlockDefectController extends Controller
             'salvage_value' => ['required', 'numeric'],
             'comment' => ['nullable','string'],
             'is_inc' => ['required','boolean'],
-
         ]);
 
         $interlock_defect = InterlockDefect::create([
@@ -88,11 +87,9 @@ class InterlockDefectController extends Controller
             'value' => $request->value,
             'comment' => $request->comment,
             'is_inc' => $request->is_inc,
-
         ]);
 
         if ($interlock_defect->exists()) {
-
             $interlock_defect->totalDefect();
             $request->session()->flash('flash.bannerStyle', 'success');
             $request->session()->flash('flash.banner', 'Defect Created');

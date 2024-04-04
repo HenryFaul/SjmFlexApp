@@ -7,6 +7,7 @@ use App\Models\InterlockLine;
 use ArielMejiaDev\LarapexCharts\BarChart;
 use ArielMejiaDev\LarapexCharts\LarapexChart;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 
 class InterlockDefectChart
 {
@@ -17,41 +18,36 @@ class InterlockDefectChart
         $this->chart = $chart;
     }
 
-    public function build(): array
+    public function build($flex_type_id,$start_date,$end_date): \Illuminate\Http\JsonResponse
     {
 
-        $today_date = Carbon::now();
-        $month = ($today_date)->monthName;
-        $filters['date'] = $today_date->toDateString();
+        $startDate = Carbon::parse($start_date);
+        $endDate = Carbon::parse($end_date);
+        $data = InterlockLine::join('line_shifts', 'interlock_lines.line_shift_id', '=', 'line_shifts.id')
+            ->whereBetween('line_shifts.shift_date', [$startDate, $endDate]) // Modify 'date_column' to your actual column  name
+            ->where('flex_type_id',$flex_type_id)
+            ->select(DB::raw('line_shifts.shift_date as shift_date'), DB::raw('SUM(interlock_lines.total_defect_qty_conv_ex) as total_qty_defect_ex'), DB::raw('SUM(interlock_lines.prod_actual) as total_actual'))
+            ->groupBy('line_shifts.shift_date')
+            ->get();
 
+        $result = $data->groupBy(function($item) use ($startDate, $endDate) {
+            if ($endDate->diffInDays($startDate) <= 7) {
+                return Carbon::parse($item->shift_date)->format('Y-m-d');
+            } elseif ($endDate->diffInWeeks($startDate) <= 4) {
+                return Carbon::parse($item->shift_date)->format('Y - W');
+            } else {
+                return Carbon::parse($item->shift_date)->format('Y-m');
+            }
+        })
+            ->map(function($group) {
+                $totalActual = $group->sum('total_actual'); // Calculate total plan first
 
-        $interlock_line_defect_inc_1 = InterlockLine::where('flex_type_id',1)->month($filters)->sum('total_defect_percent_inc');
-        $interlock_line_defect_ex_1  = InterlockLine::where('flex_type_id',1)->month($filters)->sum('total_defect_percent_ex');
+                return [
+                    'label' => $group->first()->shift_date, // Changed 'your_date_column' to 'shift_date'
+                    'ratio' => $totalActual > 0 ? $group->sum('total_qty_defect_ex') / $totalActual : -1
+                ];
+            });
 
-        $interlock_line_defect_inc_2 = InterlockLine::where('flex_type_id',2)->month($filters)->sum('total_defect_percent_inc');
-        $interlock_line_defect_ex_2  = InterlockLine::where('flex_type_id',2)->month($filters)->sum('total_defect_percent_ex');
-
-        $interlock_line_defect_inc_3 = InterlockLine::where('flex_type_id',3)->month($filters)->sum('total_defect_percent_inc');
-        $interlock_line_defect_ex_3  = InterlockLine::where('flex_type_id',3)->month($filters)->sum('total_defect_percent_ex');
-
-        $interlock_line_defect_inc_4 = InterlockLine::where('flex_type_id',4)->month($filters)->sum('total_defect_percent_inc');
-        $interlock_line_defect_ex_4  = InterlockLine::where('flex_type_id',4)->month($filters)->sum('total_defect_percent_ex');
-
-
-
-        return $this->chart->barChart()
-            ->setTitle('Interlock Defects')
-            ->setSubtitle('Month to date ('.$month.')')
-            ->addData('Passenger Inc', [$interlock_line_defect_inc_2])
-            ->addData('Passenger Ex', [$interlock_line_defect_ex_2])
-            ->addData('Small Truck Inc', [$interlock_line_defect_inc_3])
-            ->addData('Small Truck Ex', [$interlock_line_defect_ex_3])
-            ->addData('Large Truck Inc', [$interlock_line_defect_inc_4])
-            ->addData('Large Truck Ex', [$interlock_line_defect_ex_4])
-
-            ->setXAxis(['Defects'])->toVue();
-
-
-
+        return response()->json($result);
     }
 }

@@ -357,81 +357,46 @@ const people = [
                                                                 <tr>
                                                                     <th scope="col" class="whitespace-nowrap py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-0">Attribute</th>
                                                                     <th scope="col" class="whitespace-nowrap px-2 py-3.5 text-left text-sm font-semibold text-gray-900">Value</th>
-                                                                    <th scope="col" class="whitespace-nowrap px-2 py-3.5 text-left text-sm font-semibold text-gray-900">Attribute</th>
-                                                                    <th scope="col" class="whitespace-nowrap px-2 py-3.5 text-left text-sm font-semibold text-gray-900">Value</th>
-
                                                                 </tr>
                                                                 </thead>
                                                                 <tbody class="divide-y divide-gray-200 bg-white">
-
                                                                 <tr>
-                                                                    <td class="whitespace-nowrap py-2 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-0">Defect KG Inc</td>
-                                                                    <td class="whitespace-nowrap px-2 py-2 text-sm font-medium text-gray-900">{{interlock_line.total_defect_kg_inc}}</td>
-                                                                    <td class="whitespace-nowrap py-2 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-0">Defect KG Ex</td>
-                                                                    <td class="whitespace-nowrap px-2 py-2 text-sm font-medium text-gray-900">{{interlock_line.total_defect_kg_ex}}</td>
-                                                                </tr>
-
-                                                                <tr>
-                                                                    <td class="whitespace-nowrap py-2 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-0">Capacity</td>
-                                                                    <td class="whitespace-nowrap px-2 py-2 text-sm font-medium text-gray-900">{{interlock_line.prod_capacity}}</td>
-                                                                    <td class="whitespace-nowrap px-2 py-2 text-sm font-medium text-gray-900">Return</td>
-                                                                    <td class="whitespace-nowrap px-2 py-2 text-sm font-medium text-gray-900">{{interlock_line.prod_return}}</td>
-                                                                </tr>
-
-                                                                <tr>
-                                                                    <td class="whitespace-nowrap py-2 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-0">Salvage</td>
-                                                                    <td class="whitespace-nowrap px-2 py-2 text-sm font-medium text-gray-900">{{interlock_line.prod_salvage}}</td>
-                                                                    <td class="whitespace-nowrap px-2 py-2 text-sm font-medium text-gray-900">Loss</td>
+                                                                    <td class="whitespace-nowrap py-2 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-0">Product QTY Loss</td>
                                                                     <td class="whitespace-nowrap px-2 py-2 text-sm font-medium text-gray-900">{{interlock_line.prod_qty_loss}}</td>
                                                                 </tr>
-
                                                                 <tr>
-                                                                    <td class="whitespace-nowrap py-2 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-0">Loss %</td>
-                                                                    <td class="whitespace-nowrap px-2 py-2 text-sm font-medium text-gray-900">{{interlock_line.prod_percent_loss}}</td>
-                                                                    <td class="whitespace-nowrap px-2 py-2 text-sm font-medium text-gray-900">Sum Down Time</td>
-                                                                    <td class="whitespace-nowrap px-2 py-2 text-sm font-medium text-gray-900">{{interlock_line.sum_down_time}}</td>
+                                                                    <td class="whitespace-nowrap py-2 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-0">Daily Plan vs Actual</td>
+                                                                    <td class="whitespace-nowrap px-2 py-2 text-sm font-medium text-gray-900">{{Math.round(interlock_line.prod_percent_loss)}}%</td>
                                                                 </tr>
-
-
                                                                 <tr>
                                                                     <td class="whitespace-nowrap py-2 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-0">Work Time</td>
-                                                                    <td class="whitespace-nowrap px-2 py-2 text-sm font-medium text-gray-900">{{interlock_line.work_time}}</td>
-                                                                    <td class="whitespace-nowrap px-2 py-2 text-sm font-medium text-gray-900">Work Down Time</td>
+                                                                    <td class="whitespace-nowrap px-2 py-2 text-sm font-medium text-gray-900">{{Math.round(interlock_line.work_time)}}</td>
+                                                                </tr>
+                                                                <tr>
+                                                                    <td class="whitespace-nowrap px-2 py-2 text-sm font-medium text-gray-900 sm:pl-0">Work Down Time</td>
                                                                     <td class="whitespace-nowrap px-2 py-2 text-sm font-medium text-gray-900">{{interlock_line.work_down_time}}</td>
                                                                 </tr>
-
-
                                                                 <tr>
-                                                                    <td class="whitespace-nowrap py-2 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-0">Man Input</td>
-                                                                    <td class="whitespace-nowrap px-2 py-2 text-sm font-medium text-gray-900">{{interlock_line.man_input}}</td>
-                                                                    <td class="whitespace-nowrap px-2 py-2 text-sm font-medium text-gray-900">Defect Pieces Inc</td>
+                                                                    <td class="whitespace-nowrap px-2 py-2 text-sm font-medium text-gray-900 sm:pl-0">Total Defect Qty Incl</td>
                                                                     <td class="whitespace-nowrap px-2 py-2 text-sm font-medium text-gray-900">{{interlock_line.total_defect_qty_inc}}</td>
                                                                 </tr>
-
                                                                 <tr>
-                                                                    <td class="whitespace-nowrap py-2 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-0">Converted Pieces Inc</td>
-                                                                    <td class="whitespace-nowrap px-2 py-2 text-sm font-medium text-gray-900">{{interlock_line.total_defect_qty_conv_inc}}</td>
-                                                                    <td class="whitespace-nowrap px-2 py-2 text-sm font-medium text-gray-900">Converted Pieces Ex</td>
-                                                                    <td class="whitespace-nowrap px-2 py-2 text-sm font-medium text-gray-900">{{interlock_line.total_defect_qty_conv_ex}}</td>
-                                                                </tr>
-
-
-                                                                <tr>
-                                                                    <td class="whitespace-nowrap py-2 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-0">Defect Pieces Ex</td>
-                                                                    <td class="whitespace-nowrap px-2 py-2 text-sm font-medium text-gray-900">{{interlock_line.total_defect_qty_ex}}</td>
-                                                                    <td class="whitespace-nowrap px-2 py-2 text-sm font-medium text-gray-900">Converted Pieces Ex</td>
+                                                                    <td class="whitespace-nowrap py-2 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-0">Total defect excl in kg</td>
                                                                     <td class="whitespace-nowrap px-2 py-2 text-sm font-medium text-gray-900">{{interlock_line.total_defect_kg_ex}}</td>
                                                                 </tr>
-
-
                                                                 <tr>
-                                                                    <td class="whitespace-nowrap py-2 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-0">Total Inc</td>
-                                                                    <td class="whitespace-nowrap px-2 py-2 text-sm font-medium text-gray-900">{{interlock_line.total_defect_percent_inc}} %</td>
-                                                                    <td class="whitespace-nowrap px-2 py-2 text-sm font-medium text-gray-900">Total Ex</td>
-                                                                    <td class="whitespace-nowrap px-2 py-2 text-sm font-medium text-gray-900">{{interlock_line.total_defect_percent_ex}} %</td>
+                                                                    <td class="whitespace-nowrap px-2 py-2 text-sm font-medium text-gray-900 sm:pl-0">Total defect QTY Ex</td>
+                                                                    <td class="whitespace-nowrap px-2 py-2 text-sm font-medium text-gray-900">{{interlock_line.total_defect_qty_conv_ex + interlock_line.total_defect_qty_ex}}</td>
                                                                 </tr>
-
-
+                                                                <tr>
+                                                                    <td class="whitespace-nowrap py-2 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-0">Defect % Inc</td>
+                                                                    <td class="whitespace-nowrap px-2 py-2 text-sm font-medium text-gray-900">
+                                                                        {{ (interlock_line.total_defect_percent_inc * 100).toFixed(2) }} %
+                                                                    </td>
+                                                                </tr><tr>
+                                                                    <td class="whitespace-nowrap px-2 py-2 text-sm font-medium text-gray-900 sm:pl-0">Defect % Excl</td>
+                                                                    <td class="whitespace-nowrap px-2 py-2 text-sm font-medium text-gray-900">{{(interlock_line.total_defect_percent_ex * 100).toFixed(2)}} %</td>
+                                                                </tr>
                                                                 </tbody>
                                                             </table>
                                                         </div>

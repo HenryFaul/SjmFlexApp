@@ -54,7 +54,6 @@ Route::middleware([
         ->only(['index','show']);
 
     //Transport Trans modal Props
-
     Route::get('/props/line_shift_modal', [LineShiftController::class, 'getProps'])->middleware('auth')->name('props.line_shift_modal');
 
     //Interlock Downtime Modal Props
@@ -70,7 +69,7 @@ Route::middleware([
     //LineShift
 
     Route::resource('line_shift', LineShiftController::class)->middleware('auth')
-        ->only(['index','store']);
+        ->only(['index','show','store']);
 
     //InterlockLine
 

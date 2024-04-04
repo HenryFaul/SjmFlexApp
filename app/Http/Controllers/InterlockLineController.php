@@ -21,215 +21,24 @@ use Illuminate\Http\Request;
 class InterlockLineController extends Controller
 {
 
-    public function monthToDate(InterlockPlanVsActualChart $chart, InterlockDefectChart $chart2, InterlockDownTimeChart $chart3): \Inertia\Response|\Inertia\ResponseFactory
+    public function monthToDate(Request $request, InterlockPlanVsActualChart $chart, InterlockDefectChart $chart2, InterlockDownTimeChart $chart3): \Inertia\Response|\Inertia\ResponseFactory
     {
+        $request->validate([
+            'start_date' => 'nullable|date',
+            'end_date' => 'nullable|date',
+            'flex_type' => 'nullable|integer',
+        ]);
 
-
-        $today_date = Carbon::now();
-        $month = ($today_date)->monthName;
-        $filters['date'] = $today_date->toDateString();
-
-        $all_flex_1 = InterlockLine::where('flex_type_id', 1)->month($filters)->get();
-        $all_flex_2 = InterlockLine::where('flex_type_id', 2)->month($filters)->get();
-        $all_flex_3 = InterlockLine::where('flex_type_id', 3)->month($filters)->get();
-        $all_flex_4 = InterlockLine::where('flex_type_id', 4)->month($filters)->get();
-
-
-
-
-        //Flex 1
-        $sum_prod_capacity_1 = 0;
-        $sum_prod_actual_1 = 0;
-        $sum_prod_return_1 = 0;
-        $sum_work_time_1 = 0;
-        $sum_work_down_time_1 = 0;
-        $sum_man_input_1 = 0;
-        $sum_total_defect_qty_inc_1 = 0;
-        $sum_total_defect_kg_inc_1 = 0;
-        $sum_total_defect_qty_conv_inc_1 = 0;
-        $sum_total_defect_qty_conv_ex_1 = 0;
-        $sum_total_defect_qty_ex_1 = 0;
-        $sum_total_defect_kg_ex_1 = 0;
-        $sum_total_defect_percent_inc_1 = 0;
-        $sum_total_defect_percent_ex_1 = 0;
-
-        foreach ($all_flex_1 as $flex_1) {
-
-            $sum_prod_actual_1 += $flex_1->prod_actual;
-            $sum_prod_capacity_1 += $flex_1->prod_capacity;
-            $sum_prod_return_1 += $flex_1->prod_return;
-            $sum_work_time_1 += $flex_1->work_time;
-            $sum_work_down_time_1 += $flex_1->work_down_time;
-            $sum_man_input_1 += $flex_1->man_input;
-            $sum_total_defect_qty_inc_1 += $flex_1->total_defect_qty_inc;
-            $sum_total_defect_kg_inc_1 += $flex_1->total_defect_kg_inc;
-            $sum_total_defect_qty_conv_inc_1 += $flex_1->total_defect_qty_conv_inc;
-            $sum_total_defect_qty_conv_ex_1 += $flex_1->total_defect_qty_conv_ex;
-            $sum_total_defect_qty_ex_1 += $flex_1->total_defect_qty_ex;
-            $sum_total_defect_kg_ex_1 += $flex_1->total_defect_kg_ex;
-        }
-
-        //calculate defect %
-        if ($sum_prod_actual_1 > 0) {
-            $sum_total_defect_percent_inc_1 = round((($sum_total_defect_qty_inc_1 + $sum_total_defect_qty_conv_inc_1) / $sum_prod_actual_1), 4);
-            $sum_total_defect_percent_ex_1 = round((($sum_total_defect_qty_ex_1 + $sum_total_defect_qty_conv_ex_1) / $sum_prod_actual_1), 4);
-        }
-
-        $flex_1_data = array("sum_prod_actual_1" => $sum_prod_actual_1, "sum_prod_capacity_1" => $sum_prod_capacity_1,
-            "sum_prod_return_1" => $sum_prod_return_1, "sum_work_time_1" => $sum_work_time_1, "sum_work_down_time_1" => $sum_work_down_time_1,
-            "sum_man_input_1" => $sum_man_input_1, "sum_total_defect_qty_inc_1" => $sum_total_defect_qty_inc_1, "sum_total_defect_kg_inc_1" => $sum_total_defect_kg_inc_1,
-            "sum_total_defect_qty_conv_ex_1" => $sum_total_defect_qty_conv_ex_1, "sum_total_defect_qty_conv_inc_1" => $sum_total_defect_qty_conv_inc_1,
-            "sum_total_defect_qty_ex_1" => $sum_total_defect_qty_ex_1, "sum_total_defect_kg_ex_1" => $sum_total_defect_kg_ex_1,
-            "sum_total_defect_percent_inc" => $sum_total_defect_percent_inc_1, "sum_total_defect_percent_ex" => $sum_total_defect_percent_ex_1);
-
-        //Flex 2
-        $sum_prod_capacity_2 = 0;
-        $sum_prod_actual_2 = 0;
-        $sum_prod_return_2 = 0;
-        $sum_work_time_2 = 0;
-        $sum_work_down_time_2 = 0;
-        $sum_man_input_2 = 0;
-        $sum_total_defect_qty_inc_2 = 0;
-        $sum_total_defect_kg_inc_2 = 0;
-        $sum_total_defect_qty_conv_inc_2 = 0;
-        $sum_total_defect_qty_conv_ex_2 = 0;
-        $sum_total_defect_qty_ex_2 = 0;
-        $sum_total_defect_kg_ex_2 = 0;
-        $sum_total_defect_percent_inc_2 = 0;
-        $sum_total_defect_percent_ex_2 = 0;
-
-        foreach ($all_flex_2 as $flex_2) {
-
-            $sum_prod_actual_2 += $flex_2->prod_actual;
-            $sum_prod_capacity_2 += $flex_2->prod_capacity;
-            $sum_prod_return_2 += $flex_2->prod_return;
-            $sum_work_time_2 += $flex_2->work_time;
-            $sum_work_down_time_2 += $flex_2->work_down_time;
-            $sum_man_input_2 += $flex_2->man_input;
-            $sum_total_defect_qty_inc_2 += $flex_2->total_defect_qty_inc;
-            $sum_total_defect_kg_inc_2 += $flex_2->total_defect_kg_inc;
-            $sum_total_defect_qty_conv_inc_2 += $flex_2->total_defect_qty_conv_inc;
-            $sum_total_defect_qty_conv_ex_2 += $flex_2->total_defect_qty_conv_ex;
-            $sum_total_defect_qty_ex_2 += $flex_2->total_defect_qty_ex;
-            $sum_total_defect_kg_ex_2 += $flex_2->total_defect_kg_ex;
-        }
-
-        //calculate defect %
-        if ($sum_prod_actual_2 > 0) {
-            $sum_total_defect_percent_inc_2 = round((($sum_total_defect_qty_inc_2 + $sum_total_defect_qty_conv_inc_2) / $sum_prod_actual_2), 4);
-            $sum_total_defect_percent_ex_2 = round((($sum_total_defect_qty_ex_2 + $sum_total_defect_qty_conv_ex_2) / $sum_prod_actual_2), 4);
-        }
-
-        $flex_2_data = array("sum_prod_actual_2" => $sum_prod_actual_2, "sum_prod_capacity_2" => $sum_prod_capacity_2,
-            "sum_prod_return_2" => $sum_prod_return_2, "sum_work_time_2" => $sum_work_time_2, "sum_work_down_time_2" => $sum_work_down_time_2,
-            "sum_man_input_2" => $sum_man_input_2, "sum_total_defect_qty_inc_2" => $sum_total_defect_qty_inc_2, "sum_total_defect_kg_inc_2" => $sum_total_defect_kg_inc_2,
-            "sum_total_defect_qty_conv_ex_2" => $sum_total_defect_qty_conv_ex_2, "sum_total_defect_qty_conv_inc_2" => $sum_total_defect_qty_conv_inc_2,
-            "sum_total_defect_qty_ex_2" => $sum_total_defect_qty_ex_2, "sum_total_defect_kg_ex_2" => $sum_total_defect_kg_ex_2,
-            "sum_total_defect_percent_inc_2" => $sum_total_defect_percent_inc_2, "sum_total_defect_percent_ex_2" => $sum_total_defect_percent_ex_2);
-
-        //Flex 3
-        $sum_prod_capacity_3 = 0;
-        $sum_prod_actual_3 = 0;
-        $sum_prod_return_3 = 0;
-        $sum_work_time_3 = 0;
-        $sum_work_down_time_3 = 0;
-        $sum_man_input_3 = 0;
-        $sum_total_defect_qty_inc_3 = 0;
-        $sum_total_defect_kg_inc_3 = 0;
-        $sum_total_defect_qty_conv_inc_3 = 0;
-        $sum_total_defect_qty_conv_ex_3 = 0;
-        $sum_total_defect_qty_ex_3 = 0;
-        $sum_total_defect_kg_ex_3 = 0;
-        $sum_total_defect_percent_inc_3 = 0;
-        $sum_total_defect_percent_ex_3 = 0;
-
-        foreach ($all_flex_3 as $flex_3) {
-
-            $sum_prod_actual_3 += $flex_3->prod_actual;
-            $sum_prod_capacity_3 += $flex_3->prod_capacity;
-            $sum_prod_return_3 += $flex_3->prod_return;
-            $sum_work_time_3 += $flex_3->work_time;
-            $sum_work_down_time_3 += $flex_3->work_down_time;
-            $sum_man_input_3 += $flex_3->man_input;
-            $sum_total_defect_qty_inc_3 += $flex_3->total_defect_qty_inc;
-            $sum_total_defect_kg_inc_3 += $flex_3->total_defect_kg_inc;
-            $sum_total_defect_qty_conv_inc_3 += $flex_3->total_defect_qty_conv_inc;
-            $sum_total_defect_qty_conv_ex_3 += $flex_3->total_defect_qty_conv_ex;
-            $sum_total_defect_qty_ex_3 += $flex_3->total_defect_qty_ex;
-            $sum_total_defect_kg_ex_3 += $flex_3->total_defect_kg_ex;
-        }
-
-        //calculate defect %
-        if ($sum_prod_actual_3 > 0) {
-            $sum_total_defect_percent_inc_3 = round((($sum_total_defect_qty_inc_3 + $sum_total_defect_qty_conv_inc_3) / $sum_prod_actual_3), 4);
-            $sum_total_defect_percent_ex_3 = round((($sum_total_defect_qty_ex_3 + $sum_total_defect_qty_conv_ex_3) / $sum_prod_actual_3), 4);
-        }
-
-        $flex_3_data = array("sum_prod_actual_3" => $sum_prod_actual_3, "sum_prod_capacity_3" => $sum_prod_capacity_3,
-            "sum_prod_return_3" => $sum_prod_return_3, "sum_work_time_3" => $sum_work_time_3, "sum_work_down_time_3" => $sum_work_down_time_3,
-            "sum_man_input_3" => $sum_man_input_3, "sum_total_defect_qty_inc_3" => $sum_total_defect_qty_inc_3, "sum_total_defect_kg_inc_3" => $sum_total_defect_kg_inc_3,
-            "sum_total_defect_qty_conv_ex_3" => $sum_total_defect_qty_conv_ex_3, "sum_total_defect_qty_conv_inc_3" => $sum_total_defect_qty_conv_inc_3,
-            "sum_total_defect_qty_ex_3" => $sum_total_defect_qty_ex_3, "sum_total_defect_kg_ex_3" => $sum_total_defect_kg_ex_3,
-            "sum_total_defect_percent_inc_3" => $sum_total_defect_percent_inc_3, "sum_total_defect_percent_ex_3" => $sum_total_defect_percent_ex_3);
-
-
-        //Flex 4
-        $sum_prod_capacity_4 = 0;
-        $sum_prod_actual_4 = 0;
-        $sum_prod_return_4 = 0;
-        $sum_work_time_4 = 0;
-        $sum_work_down_time_4 = 0;
-        $sum_man_input_4 = 0;
-        $sum_total_defect_qty_inc_4 = 0;
-        $sum_total_defect_kg_inc_4 = 0;
-        $sum_total_defect_qty_conv_inc_4 = 0;
-        $sum_total_defect_qty_conv_ex_4 = 0;
-        $sum_total_defect_qty_ex_4 = 0;
-        $sum_total_defect_kg_ex_4 = 0;
-        $sum_total_defect_percent_inc_4 = 0;
-        $sum_total_defect_percent_ex_4 = 0;
-
-        foreach ($all_flex_4 as $flex_4) {
-
-            $sum_prod_actual_4 += $flex_4->prod_actual;
-            $sum_prod_capacity_4 += $flex_4->prod_capacity;
-            $sum_prod_return_4 += $flex_4->prod_return;
-            $sum_work_time_4 += $flex_4->work_time;
-            $sum_work_down_time_4 += $flex_4->work_down_time;
-            $sum_man_input_4 += $flex_4->man_input;
-            $sum_total_defect_qty_inc_4 += $flex_4->total_defect_qty_inc;
-            $sum_total_defect_kg_inc_4 += $flex_4->total_defect_kg_inc;
-            $sum_total_defect_qty_conv_inc_4 += $flex_4->total_defect_qty_conv_inc;
-            $sum_total_defect_qty_conv_ex_4 += $flex_4->total_defect_qty_conv_ex;
-            $sum_total_defect_qty_ex_4 += $flex_4->total_defect_qty_ex;
-            $sum_total_defect_kg_ex_4 += $flex_4->total_defect_kg_ex;
-        }
-
-        //calculate defect %
-        if ($sum_prod_actual_4 > 0) {
-            $sum_total_defect_percent_inc_4 = round((($sum_total_defect_qty_inc_4 + $sum_total_defect_qty_conv_inc_4) / $sum_prod_actual_4), 4);
-            $sum_total_defect_percent_ex_4 = round((($sum_total_defect_qty_ex_4 + $sum_total_defect_qty_conv_ex_4) / $sum_prod_actual_4), 4);
-        }
-
-        $flex_4_data = array("sum_prod_actual_4" => $sum_prod_actual_4, "sum_prod_capacity_4" => $sum_prod_capacity_4,
-            "sum_prod_return_4" => $sum_prod_return_4, "sum_work_time_4" => $sum_work_time_4, "sum_work_down_time_4" => $sum_work_down_time_4,
-            "sum_man_input_4" => $sum_man_input_4, "sum_total_defect_qty_inc_4" => $sum_total_defect_qty_inc_4, "sum_total_defect_kg_inc_4" => $sum_total_defect_kg_inc_4,
-            "sum_total_defect_qty_conv_ex_4" => $sum_total_defect_qty_conv_ex_4, "sum_total_defect_qty_conv_inc_4" => $sum_total_defect_qty_conv_inc_4,
-            "sum_total_defect_qty_ex_4" => $sum_total_defect_qty_ex_4, "sum_total_defect_kg_ex_4" => $sum_total_defect_kg_ex_4,
-            "sum_total_defect_percent_inc_4" => $sum_total_defect_percent_inc_4, "sum_total_defect_percent_ex_4" => $sum_total_defect_percent_ex_4);
-
-
+        $startDate = $request->input('start_date', now()->startOfMonth());
+        $endDate = $request->input('end_date', now());
+        $flexType = $request->input('flex_type', 2);
 
         return inertia(
             'InterlockLine/MonthToDate',
             [
-                'chart' => $chart->build(),
-                'chart2' => $chart2->build(),
-                'chart3' => $chart3->build(),
-                'flex_1_data'=>$flex_1_data,
-                'flex_2_data'=>$flex_2_data,
-                'flex_3_data'=>$flex_3_data,
-                'flex_4_data'=>$flex_4_data
+                'chart' => $chart->build($flexType,'2023-08-01','2023-08-05'),
+                'chart2' => $chart2->build($flexType,'2023-08-01','2023-08-05'),
+                'chart3' => $chart3->build($flexType,'2023-08-01','2023-08-05'),
             ]
         );
 

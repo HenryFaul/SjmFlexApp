@@ -88,7 +88,9 @@ class InterlockDefect extends Model
 
         $interlock_line = InterlockLine::where('id',$interlock_defect->interlock_line_id)->first();
 
-        $interlock_line->total_defect_qty_inc=$inc_pieces;
+        //=IFERROR([@[Defect Qty Total Excl2]]+[@Material2];"")
+        $interlock_line->total_defect_qty_inc=$ex_pieces + $ex_pieces_conv; // + Whatever Material2 is as its always 0;
+
         $interlock_line->total_defect_kg_inc=$inc_weight;
         $interlock_line->total_defect_qty_ex=$ex_pieces;
         $interlock_line->total_defect_kg_ex=$ex_weight;
@@ -97,8 +99,11 @@ class InterlockDefect extends Model
 
         //calculate defect %
         if ($interlock_line->prod_actual>0){
-            $interlock_line->total_defect_percent_inc = round((($inc_pieces+$inc_pieces_conv)/$interlock_line->prod_actual),4);
-            $interlock_line->total_defect_percent_ex = round((($ex_pieces+$ex_pieces_conv)/$interlock_line->prod_actual),4);
+            //=IFERROR([@[Defect Qty Total Incl]]/[@[Prod Actual]];"")
+            $interlock_line->total_defect_percent_inc = $interlock_line->total_defect_qty_inc/$interlock_line->prod_actual;
+            //=IFERROR([@[Defect Qty Total Excl2]]/([@[Prod Actual]]+[@[Defect Qty Total Excl2]]);"")
+            $total_qty_ex = $ex_pieces+$ex_pieces_conv;
+            $interlock_line->total_defect_percent_ex = $total_qty_ex/($interlock_line->prod_actual + $total_qty_ex);
         }
 
 

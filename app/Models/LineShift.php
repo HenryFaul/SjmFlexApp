@@ -21,8 +21,4 @@ class LineShift extends Model
     {
         return $this->belongsTo(Shift::class,'shift_type_id');
     }
-
-
-
-
 }

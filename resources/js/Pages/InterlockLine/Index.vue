@@ -138,7 +138,6 @@ const edit = (id) => {
                                         </th>
                                         <th scope="col" class="w-2/12 py-4 px-6 text-xs font-semibold tracking-wider text-left text-white uppercase">Shift Type</th>
                                         <th scope="col" class="w-2/12 py-4 px-6 text-xs font-semibold tracking-wider text-left text-white uppercase">Model</th>
-
                                         <th scope="col" class="w-2/12 py-4 px-6 text-xs font-semibold tracking-wider text-left text-white uppercase">
                                             Product Capacity
                                         </th>
@@ -148,7 +147,15 @@ const edit = (id) => {
                                         <th scope="col" class="w-2/12 py-4 px-6 text-xs font-semibold tracking-wider text-left text-white uppercase">
                                             Product Actual
                                         </th>
-
+                                        <th scope="col" class="w-2/12 py-4 px-6 text-xs font-semibold tracking-wider text-left text-white uppercase">
+                                            Daily Plan vs Actual %
+                                        </th>
+                                        <th scope="col" class="w-2/12 py-4 px-6 text-xs font-semibold tracking-wider text-left text-white uppercase">
+                                           Defect Ex Qty (Kg)
+                                        </th>
+                                        <th scope="col" class="w-2/12 py-4 px-6 text-xs font-semibold tracking-wider text-left text-white uppercase">
+                                            Defect Ex %
+                                        </th>
                                         <th scope="col" class="w-2/12 py-4 px-6 text-xs font-semibold tracking-wider text-left text-white uppercase">Actions</th>
                                     </tr>
                                     </thead>
@@ -180,6 +187,15 @@ const edit = (id) => {
 
                                         <td class="py-4 px-6 whitespace-nowrap">
                                             {{line_item.prod_actual}}
+                                        </td>
+                                        <td class="py-4 px-6 whitespace-nowrap">
+                                            {{Math.round(line_item.prod_percent_loss)}}%
+                                        </td>
+                                        <td class="py-4 px-6 whitespace-nowrap">
+                                            {{line_item.total_defect_qty_conv_ex + line_item.total_defect_qty_ex}}
+                                        </td>
+                                        <td class="py-4 px-6 whitespace-nowrap">
+                                            {{(line_item.total_defect_percent_ex * 100).toFixed(2)}} %
                                         </td>
 
                                         <td class="py-4 px-6 whitespace-nowrap">

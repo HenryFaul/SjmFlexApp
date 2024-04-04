@@ -10,7 +10,6 @@ use Tests\TestCase;
 
 class DeleteApiTokenTest extends TestCase
 {
-    use RefreshDatabase;
 
     public function test_api_tokens_can_be_deleted(): void
     {

@@ -7,6 +7,7 @@ use App\Models\InterlockLine;
 use ArielMejiaDev\LarapexCharts\BarChart;
 use ArielMejiaDev\LarapexCharts\LarapexChart;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 
 class InterlockDownTimeChart
 {
@@ -17,31 +18,35 @@ class InterlockDownTimeChart
         $this->chart = $chart;
     }
 
-    public function build(): array
+    public function build($flex_type_id,$start_date,$end_date): \Illuminate\Http\JsonResponse
     {
+        $startDate = Carbon::parse($start_date);
+        $endDate = Carbon::parse($end_date);
+        $data = InterlockLine::join('line_shifts', 'interlock_lines.line_shift_id', '=', 'line_shifts.id')
+            ->whereBetween('line_shifts.shift_date', [$startDate, $endDate]) // Modify 'date_column' to your actual column  name
+            ->where('flex_type_id',$flex_type_id)
+            ->select(DB::raw('line_shifts.shift_date as shift_date'), DB::raw('SUM(interlock_lines.work_time) as total_work_time'), DB::raw('SUM(interlock_lines.work_down_time) as total_work_down_time'))
+            ->groupBy('line_shifts.shift_date')
+            ->get();
 
-        $today_date = Carbon::now();
-        $month = ($today_date)->monthName;
-        $filters['date'] = $today_date->toDateString();
+        $result = $data->groupBy(function($item) use ($startDate, $endDate) {
+            if ($endDate->diffInDays($startDate) <= 7) {
+                return Carbon::parse($item->shift_date)->format('Y-m-d');
+            } elseif ($endDate->diffInWeeks($startDate) <= 4) {
+                return Carbon::parse($item->shift_date)->format('Y - W');
+            } else {
+                return Carbon::parse($item->shift_date)->format('Y-m');
+            }
+        })
+            ->map(function($group) {
+                $totalWorkTime = $group->sum('total_work_time'); // Calculate total plan first
 
+                return [
+                    'label' => $group->first()->shift_date, // Changed 'your_date_column' to 'shift_date'
+                    'ratio' => $totalWorkTime > 0 ? $group->sum('total_work_down_time') / $totalWorkTime : -1
+                ];
+            });
 
-        $interlock_line_down_time_inc_1 = InterlockLine::where('flex_type_id',1)->month($filters)->sum('sum_down_time');
-        $interlock_line_down_time_inc_2 = InterlockLine::where('flex_type_id',2)->month($filters)->sum('sum_down_time');
-        $interlock_line_down_time_inc_3 = InterlockLine::where('flex_type_id',3)->month($filters)->sum('sum_down_time');
-        $interlock_line_down_time_inc_4 = InterlockLine::where('flex_type_id',4)->month($filters)->sum('sum_down_time');
-
-
-
-        return $this->chart->barChart()
-            ->setTitle('Interlock Down Time')
-            ->setSubtitle('Month to date ('.$month.')')
-            ->addData('Passenger Down Time', [$interlock_line_down_time_inc_2])
-            ->addData('Small Truck Down Time', [$interlock_line_down_time_inc_3])
-            ->addData('Large Truck Down Time', [$interlock_line_down_time_inc_4])
-
-            ->setXAxis(['Down Times'])->toVue();
-
-
-
+        return response()->json($result);
     }
 }

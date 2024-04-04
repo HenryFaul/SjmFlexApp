@@ -10,8 +10,10 @@ use App\Imports\ImportRing;
 use App\Imports\ImportRingTube;
 use App\Imports\ImportSpring;
 use App\Imports\ImportStaffMember;
+use App\Imports\ImportInterlockLines;
 use App\Models\Braiding;
 use App\Models\Interlock;
+use App\Models\InterlockLine;
 use App\Models\ProductionModel;
 use App\Models\Ring;
 use App\Models\RingTube;
@@ -99,6 +101,18 @@ class DataImportController extends Controller
                 $count_after = Interlock::all()->count();
 
                 $message = "Interlock Count before: ".$count_before." count after: ".$count_after;
+
+                break;
+            case "InterlockLines.xlsx":
+
+                $count_before = InterlockLine::all()->count();
+
+                Excel::import(new ImportInterlockLines(),
+                    $request->file('file')->store('files'));
+
+                $count_after = InterlockLine::all()->count();
+
+                $message = "Interlock lines count before: ".$count_before." count after: ".$count_after;
 
                 break;
 
