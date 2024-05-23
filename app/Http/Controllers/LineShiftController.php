@@ -25,11 +25,26 @@ class LineShiftController extends Controller
     /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return \Inertia\Response|\Inertia\ResponseFactory
      */
-    public function index()
+    public function index(Request $request)
     {
-        //
+        $filters = $request->only([
+            'searchName',
+            'field',
+            'direction',
+            'show'
+        ]);
+        $paginate = $request['show'] ?? 10;
+        $lineShifts = LineShift::with('Shift')->paginate($paginate)->withQueryString();
+
+        return inertia(
+            'LineShift/Index',
+            [
+                'filters' => $filters,
+                'line_shifts' => $lineShifts,
+            ]
+        );
     }
 
     /**

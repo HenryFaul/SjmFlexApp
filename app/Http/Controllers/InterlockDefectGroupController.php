@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\InterlockDefectGroup;
+use App\Models\DefectGroup;
 use Illuminate\Http\Request;
 
 class InterlockDefectGroupController extends Controller
@@ -41,10 +41,10 @@ class InterlockDefectGroupController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  \App\Models\InterlockDefectGroup  $interlockDefectGroup
+     * @param  \App\Models\DefectGroup  $interlockDefectGroup
      * @return \Illuminate\Http\Response
      */
-    public function show(InterlockDefectGroup $interlockDefectGroup)
+    public function show(DefectGroup $interlockDefectGroup)
     {
         //
     }
@@ -52,10 +52,10 @@ class InterlockDefectGroupController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  \App\Models\InterlockDefectGroup  $interlockDefectGroup
+     * @param  \App\Models\DefectGroup  $interlockDefectGroup
      * @return \Illuminate\Http\Response
      */
-    public function edit(InterlockDefectGroup $interlockDefectGroup)
+    public function edit(DefectGroup $interlockDefectGroup)
     {
         //
     }
@@ -64,10 +64,10 @@ class InterlockDefectGroupController extends Controller
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\InterlockDefectGroup  $interlockDefectGroup
+     * @param  \App\Models\DefectGroup  $interlockDefectGroup
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, InterlockDefectGroup $interlockDefectGroup)
+    public function update(Request $request, DefectGroup $interlockDefectGroup)
     {
         //
     }
@@ -75,10 +75,10 @@ class InterlockDefectGroupController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Models\InterlockDefectGroup  $interlockDefectGroup
+     * @param  \App\Models\DefectGroup  $interlockDefectGroup
      * @return \Illuminate\Http\Response
      */
-    public function destroy(InterlockDefectGroup $interlockDefectGroup)
+    public function destroy(DefectGroup $interlockDefectGroup)
     {
         //
     }

@@ -9,7 +9,6 @@ use Tests\TestCase;
 
 class DeleteAccountTest extends TestCase
 {
-    use RefreshDatabase;
 
     public function test_user_accounts_can_be_deleted(): void
     {

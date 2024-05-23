@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\InterlockDownTimeType;
+use App\Models\DownTimeType;
 use Illuminate\Http\Request;
 
 class InterlockDownTimeTypeController extends Controller
@@ -41,10 +41,10 @@ class InterlockDownTimeTypeController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  \App\Models\InterlockDownTimeType  $interlockDownTimeType
+     * @param  \App\Models\DownTimeType  $interlockDownTimeType
      * @return \Illuminate\Http\Response
      */
-    public function show(InterlockDownTimeType $interlockDownTimeType)
+    public function show(DownTimeType $interlockDownTimeType)
     {
         //
     }
@@ -52,10 +52,10 @@ class InterlockDownTimeTypeController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  \App\Models\InterlockDownTimeType  $interlockDownTimeType
+     * @param  \App\Models\DownTimeType  $interlockDownTimeType
      * @return \Illuminate\Http\Response
      */
-    public function edit(InterlockDownTimeType $interlockDownTimeType)
+    public function edit(DownTimeType $interlockDownTimeType)
     {
         //
     }
@@ -64,10 +64,10 @@ class InterlockDownTimeTypeController extends Controller
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\InterlockDownTimeType  $interlockDownTimeType
+     * @param  \App\Models\DownTimeType  $interlockDownTimeType
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, InterlockDownTimeType $interlockDownTimeType)
+    public function update(Request $request, DownTimeType $interlockDownTimeType)
     {
         //
     }
@@ -75,10 +75,10 @@ class InterlockDownTimeTypeController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Models\InterlockDownTimeType  $interlockDownTimeType
+     * @param  \App\Models\DownTimeType  $interlockDownTimeType
      * @return \Illuminate\Http\Response
      */
-    public function destroy(InterlockDownTimeType $interlockDownTimeType)
+    public function destroy(DownTimeType $interlockDownTimeType)
     {
         //
     }
