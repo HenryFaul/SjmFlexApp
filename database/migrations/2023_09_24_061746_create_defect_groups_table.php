@@ -13,9 +13,11 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('interlock_types', function (Blueprint $table) {
+        Schema::create('defect_groups', function (Blueprint $table) {
             $table->id();
-            $table->string('name')->unique();
+            $table->string('value')->unique();
+            $table->text('comment')->nullable();
+            $table->string('component');
             $table->softDeletes();
             $table->timestamps();
         });
@@ -28,6 +30,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('interlock_types');
+        Schema::dropIfExists('defect_groups');
     }
 };

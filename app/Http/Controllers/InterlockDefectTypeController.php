@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\InterlockDefectType;
+use App\Models\DefectType;
 use Illuminate\Http\Request;
 
 class InterlockDefectTypeController extends Controller
@@ -41,10 +41,10 @@ class InterlockDefectTypeController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  \App\Models\InterlockDefectType  $interlockDefectType
+     * @param  \App\Models\DefectType  $interlockDefectType
      * @return \Illuminate\Http\Response
      */
-    public function show(InterlockDefectType $interlockDefectType)
+    public function show(DefectType $interlockDefectType)
     {
         //
     }
@@ -52,10 +52,10 @@ class InterlockDefectTypeController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  \App\Models\InterlockDefectType  $interlockDefectType
+     * @param  \App\Models\DefectType  $interlockDefectType
      * @return \Illuminate\Http\Response
      */
-    public function edit(InterlockDefectType $interlockDefectType)
+    public function edit(DefectType $interlockDefectType)
     {
         //
     }
@@ -64,10 +64,10 @@ class InterlockDefectTypeController extends Controller
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\InterlockDefectType  $interlockDefectType
+     * @param  \App\Models\DefectType  $interlockDefectType
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, InterlockDefectType $interlockDefectType)
+    public function update(Request $request, DefectType $interlockDefectType)
     {
         //
     }
@@ -75,10 +75,10 @@ class InterlockDefectTypeController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Models\InterlockDefectType  $interlockDefectType
+     * @param  \App\Models\DefectType  $interlockDefectType
      * @return \Illuminate\Http\Response
      */
-    public function destroy(InterlockDefectType $interlockDefectType)
+    public function destroy(DefectType $interlockDefectType)
     {
         //
     }

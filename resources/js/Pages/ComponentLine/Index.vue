@@ -174,7 +174,7 @@ const edit = (id) => {
                                         </td>
 
                                         <td class="py-4 px-6 whitespace-nowrap">
-                                            {{line_item.production_model.model}}
+                                            {{line_item.component.production_model.model}}
                                         </td>
 
                                         <td class="py-4 px-6 whitespace-nowrap">
@@ -189,7 +189,7 @@ const edit = (id) => {
                                             {{line_item.prod_actual}}
                                         </td>
                                         <td class="py-4 px-6 whitespace-nowrap">
-                                            {{Math.round(line_item.prod_percent_loss)}}%
+                                            {{Math.round(line_item.daily_plan_vs_actual)}}%
                                         </td>
                                         <td class="py-4 px-6 whitespace-nowrap">
                                             {{line_item.total_defect_qty_conv_ex + line_item.total_defect_qty_ex}}

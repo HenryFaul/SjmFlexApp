@@ -3,10 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\DefectBasis;
-use App\Models\InterlockDefect;
-use App\Models\InterlockDefectGroup;
-use App\Models\InterlockDefectType;
-use App\Models\InterlockDownTimeType;
+use App\Models\ComponentDefect;
+use App\Models\DefectGroup;
+use App\Models\DefectType;
+use App\Models\DownTimeType;
 use Illuminate\Http\Request;
 
 class InterlockDefectController extends Controller
@@ -19,9 +19,9 @@ class InterlockDefectController extends Controller
       // ['line_shift_id','interlock_line_id','production_model_type_id','interlock_defect_type_id',
        // 'interlock_defect_group_type_id','defect_bases_type_id','value','salvage_value'];
 
-        $all_interlock_defect_groups = InterlockDefectGroup::all();
+        $all_interlock_defect_groups = DefectGroup::all();
         $all_defect_bases = DefectBasis::all();
-        $all_interlock_defect_types = InterlockDefectType::all();
+        $all_interlock_defect_types = DefectType::all();
 
         return array("all_interlock_defect_groups"=>$all_interlock_defect_groups,"all_defect_bases"=>$all_defect_bases,"all_interlock_defect_types"=>$all_interlock_defect_types);
     }
@@ -62,35 +62,30 @@ class InterlockDefectController extends Controller
 
         $request->validate([
             'line_shift_id' => ['required', 'integer','exists:line_shifts,id'],
-            'interlock_line_id' => ['required', 'integer', 'exists:interlock_lines,id'],
-            'production_model_type_id' => ['required', 'integer', 'exists:production_models,id'],
-            'interlock_type_id' => ['required', 'integer', 'exists:interlocks,id'],
-            'interlock_defect_type_id' => ['required', 'integer', 'exists:interlock_defect_types,id'],
-            'interlock_defect_group_type_id' => ['required', 'integer', 'exists:interlock_defect_groups,id'],
+            'component_line_id' => ['required', 'integer', 'exists:component_lines,id'],
+            'defect_type_id' => ['required', 'integer', 'exists:defect_types,id'],
             'defect_bases_type_id' => ['required', 'integer', 'exists:defect_bases,id'],
             'value' => ['required', 'numeric'],
             'salvage_value' => ['required', 'numeric'],
             'comment' => ['nullable','string'],
             'is_inc' => ['required','boolean'],
+            'component' => ['required','string']
         ]);
 
-        $interlock_defect = InterlockDefect::create([
+        $interlock_defect = ComponentDefect::create([
             'line_shift_id' => $request->line_shift_id,
-            'interlock_line_id' => $request->interlock_line_id,
-            'production_model_type_id' => $request->production_model_type_id,
-            'interlock_type_id' => $request->interlock_type_id,
-            'interlock_defect_type_id' => $request->interlock_defect_type_id,
-            'interlock_down_time_type_id' => $request->interlock_down_time_type_id,
-            'interlock_defect_group_type_id' => $request->interlock_defect_group_type_id,
+            'component_line_id' => $request->component_line_id,
+            'defect_type_id' => $request->defect_type_id,
             'defect_bases_type_id' => $request->defect_bases_type_id,
             'salvage_value' => $request->salvage_value,
             'value' => $request->value,
             'comment' => $request->comment,
             'is_inc' => $request->is_inc,
+            'component' => $request->component,
         ]);
 
         if ($interlock_defect->exists()) {
-            $interlock_defect->totalDefect();
+            $interlock_defect->ComponentLine->recalculateComponentLineDefects($request->component);
             $request->session()->flash('flash.bannerStyle', 'success');
             $request->session()->flash('flash.banner', 'Defect Created');
         } else {
@@ -104,10 +99,10 @@ class InterlockDefectController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  \App\Models\InterlockDefect  $interlockDefect
+     * @param  \App\Models\ComponentDefect  $interlockDefect
      * @return \Illuminate\Http\Response
      */
-    public function show(InterlockDefect $interlockDefect)
+    public function show(ComponentDefect $interlockDefect)
     {
         //
     }
@@ -115,10 +110,10 @@ class InterlockDefectController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  \App\Models\InterlockDefect  $interlockDefect
+     * @param  \App\Models\ComponentDefect  $interlockDefect
      * @return \Illuminate\Http\Response
      */
-    public function edit(InterlockDefect $interlockDefect)
+    public function edit(ComponentDefect $interlockDefect)
     {
         //
     }
@@ -127,10 +122,10 @@ class InterlockDefectController extends Controller
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\InterlockDefect  $interlockDefect
+     * @param  \App\Models\ComponentDefect  $interlockDefect
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, InterlockDefect $interlockDefect)
+    public function update(Request $request, ComponentDefect $interlockDefect)
     {
         //
     }
@@ -138,10 +133,10 @@ class InterlockDefectController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Models\InterlockDefect  $interlockDefect
+     * @param  \App\Models\ComponentDefect  $interlockDefect
      * @return \Illuminate\Http\Response
      */
-    public function destroy(InterlockDefect $interlockDefect)
+    public function destroy(ComponentDefect $interlockDefect)
     {
         //
     }

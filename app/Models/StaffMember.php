@@ -15,7 +15,7 @@ class StaffMember extends Model
 
     public $fillable = ['title','first_name','last_name','is_active','staff_clock_no'];
 
-    public function scopeSearch($query, $searchTerm)
+    public function scopeFilter($query, $searchTerm)
     {
         // Split the search term into separate words
         $splitSearch = array_filter(explode(' ', $searchTerm)); // Split into words, remove empty

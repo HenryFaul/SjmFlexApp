@@ -5,6 +5,7 @@ import SecondaryButton from '@/Components/SecondaryButton.vue';
 import {router, useForm, usePage} from "@inertiajs/vue3";
 import Chart from "../../Components/Chart.vue";
 import VueDatePicker from "@vuepic/vue-datepicker";
+import moment from 'moment';
 import {CheckIcon, ChevronUpDownIcon, PaperClipIcon} from '@heroicons/vue/20/solid';
 import {
     Combobox,
@@ -28,9 +29,11 @@ const props = defineProps({
     chart3:Object
 });
 const filterCharts = () => {
+    const formattedStartDate = moment(startDate.value).format('YYYY-MM-DD');
+    const formattedEndDate = moment(endDate.value).format('YYYY-MM-DD');
     router.get('/interlock_line_graph/month_to_date', {
-        start_date: startDate.value,
-        end_date: endDate.value,
+        start_date: formattedStartDate,
+        end_date: formattedEndDate,
         flex_type: selectedFlexType.value,
     }, {
         preserveState: true, // Maintain other page state
@@ -57,13 +60,13 @@ const filterCharts = () => {
                                     <div class="mt-3">
                                         <div>
                                             <label class="block text-sm font-medium leading-6 text-gray-900">Start Date</label>
-                                            <VueDatePicker v-model="startDate"  style="width: 250px;" :teleport="true"></VueDatePicker>
+                                            <VueDatePicker v-model="startDate" format="yyyy-MM-dd" style="width: 250px;" :teleport="true"></VueDatePicker>
                                         </div>
                                     </div>
                                     <div class="mt-3">
                                         <div>
                                             <label class="block text-sm font-medium leading-6 text-gray-900">Start Date</label>
-                                            <VueDatePicker v-model="endDate" style="width: 250px;" :teleport="true"></VueDatePicker>
+                                            <VueDatePicker v-model="endDate" format="yyyy-MM-dd" style="width: 250px;" :teleport="true"></VueDatePicker>
                                         </div>
                                     </div>
                                     <div class="mt-3">

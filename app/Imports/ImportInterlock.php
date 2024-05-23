@@ -4,6 +4,7 @@ namespace App\Imports;
 
 use App\Models\Braiding;
 use App\Models\BraidingType;
+use App\Models\Component;
 use App\Models\FlexType;
 use App\Models\Interlock;
 use App\Models\InterlockType;
@@ -21,13 +22,8 @@ class ImportInterlock implements ToCollection, WithHeadingRow
 
     public function collection(Collection $collection)
     {
-        //Model	Interlock	Type	Flex Type	Bom	Cutting Type Location	Syspro Code
-
-        //'model','interlock_value','interlock_type_id','flex_type_id','bom','location_type_id',cutting_type_id,'syspro_code','is_active'
-
         foreach ($collection as $row) {
             if ($row != null) {
-
                 if ($row['model'] != '') {
 
                     $Model = trim($row['model']);
@@ -40,46 +36,32 @@ class ImportInterlock implements ToCollection, WithHeadingRow
                     $SysproCodes = trim($row['syspro_codes']);
 
                     //Get IDS
-
-                    $interlock_type = InterlockType::where('name','LIKE',"%{$Type}%")->first();
-                    $interlock_type_id = $interlock_type == null ? 1 : $interlock_type->id;
-
                     $flex_type = FlexType::where('name','LIKE',"%{$FlexType}%")->first();
                     $flex_type_id = $flex_type == null ? 1 : $flex_type->id;
-
-                    $cutting_type = FlexType::where('name','LIKE',"%{$CuttingType}%")->first();
-                    $cutting_type_id = $cutting_type == null ? 1 : $cutting_type->id;
-
-                    $location_type = LocationType::where('name','LIKE',"%{$Location}%")->first();
-                    $location_type_id = $location_type == null ? $flex_type_id : $location_type->id;
 
                     $model_type = ProductionModel::where('model','LIKE',"%{$Model}%")->first();
 
                     $model_type_id = $model_type == null ? $flex_type_id : $model_type->id;
 
-                    $found_interlock = Interlock::where('model_type_id',$model_type_id)->where('flex_type_id',$flex_type_id)->first();
+                    $found_interlock = Component::where('component','Interlock')->where('model_type_id',$model_type_id)->where('flex_type_id',$flex_type_id)->first();
 
 
                     if($found_interlock == null){
                         //'model','tubing_value','braiding_type_id','flex_type_id','bom','syspro_code','is_active'
-                        Interlock::create([
+                        Component::create([
+                            'component'=>'Interlock',
                             'model_type_id' => $model_type_id,
-                            'interlock_value'=>$InterLock,
-                            'interlock_type_id'=>$interlock_type_id,
+                            'component_value'=>$InterLock,
+                            'component_type'=>$Type,
                             'flex_type_id'=>$flex_type_id,
                             'bom'=>$Bom,
-                            'location_type_id'=>$location_type_id,
-                            'cutting_type_id'=>$cutting_type_id,
+                            'location'=>$Location,
+                            'cutting_type'=>$CuttingType,
                             'syspro_code'=>$SysproCodes,
                             'is_active'=>true
 
                         ]);
                     }
-
-
-
-
-
                 }
             }
         }

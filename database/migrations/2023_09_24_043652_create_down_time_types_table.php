@@ -13,12 +13,15 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('interlock_defect_types', function (Blueprint $table) {
+
+
+
+        Schema::create('down_time_types', function (Blueprint $table) {
             $table->id();
-            $table->string('value')->unique();
+            $table->string('type')->unique();
             $table->text('comment')->nullable();
-            $table->boolean('is_material_error')->default(false);
-            $table->boolean('is_active')->default(true);
+            $table->boolean('is_active')->default(1);
+            $table->string('component');
             $table->softDeletes();
             $table->timestamps();
         });
@@ -31,6 +34,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('interlock_defect_types');
+        Schema::dropIfExists('down_time_types');
     }
 };

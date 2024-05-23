@@ -13,10 +13,17 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('interlock_defect_groups', function (Blueprint $table) {
+        Schema::create('defect_types', function (Blueprint $table) {
             $table->id();
             $table->string('value')->unique();
             $table->text('comment')->nullable();
+            $table->boolean('is_material_error')->default(false);
+            $table->boolean('is_active')->default(true);
+            $table->string('component');
+            $table->integer('import_pos')->nullable();
+            $table->bigInteger('defect_group_id')->unsigned();
+            $table->foreign('defect_group_id')
+                ->references('id')->on('defect_groups')->onDelete('cascade');
             $table->softDeletes();
             $table->timestamps();
         });
@@ -29,6 +36,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('interlock_defect_groups');
+        Schema::dropIfExists('defect_types');
     }
 };

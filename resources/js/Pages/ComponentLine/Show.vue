@@ -17,12 +17,11 @@ import {
 
 import {CheckIcon, ChevronUpDownIcon, PaperClipIcon} from '@heroicons/vue/20/solid';
 
-
 const swal = inject('$swal');
 
-
 const props = defineProps({
-    interlock_line:Object,
+    component:String,
+    component_line:Object,
     all_staff_members:Object,
     all_business_units:Object,
     all_assembly_lines:Object,
@@ -30,33 +29,23 @@ const props = defineProps({
     defects:Object
 });
 
-//'job_card_no','production_model_type_id','shift_leader_id','operator_id','business_unit_id','assembly_line_id'
-
-//'line_shift_id', 'job_card_no', 'production_model_type_id', 'shift_leader_id', 'operator_id', 'business_unit_id', 'assembly_line_id', 'prod_capacity', 'prod_plan', 'prod_actual', 'prod_return',
-//'prod_salvage', 'prod_qty_loss', 'prod_percent_loss', 'work_time', 'work_down_time', 'man_input', 'total_defect_qty_inc',
- //   'total_defect_qty_ex', 'total_defect_percent_inc', 'total_defect_percent_ex'
-let interlockForm = useForm({
-
-    line_shift_id:props.interlock_line.line_shift_id,
-    job_card_no:props.interlock_line.job_card_no,
-    production_model_type_id:  props.interlock_line.production_model_type_id,
-    interlock_type_id:  props.interlock_line.interlock_type_id,
-    shift_leader_id: props.interlock_line.shift_leader_id,
-    operator_id:props.interlock_line.operator_id,
-    business_unit_id: props.interlock_line.business_unit_id,
-    assembly_line_id:props.interlock_line.assembly_line_id,
-    prod_plan:props.interlock_line.prod_plan,
-    prod_actual:props.interlock_line.prod_actual,
-    man_input:props.interlock_line.man_input,
+let componentForm = useForm({
+    line_shift_id:props.component_line.line_shift_id,
+    job_card_no:props.component_line.job_card_no,
+    production_model_type_id:  props.component_line.component.model_type_id,
+    component_id:  props.component_line.component_id,
+    shift_leader_id: props.component_line.shift_leader_id,
+    operator_id:props.component_line.operator_id,
+    business_unit_id: props.component_line.business_unit_id,
+    assembly_line_id:props.component_line.assembly_line_id,
+    prod_plan:props.component_line.prod_plan,
+    prod_actual:props.component_line.prod_actual,
+    man_input:props.component_line.man_input,
 
 });
 
-/*
-const updateInterlockLine= () => {
-
-    alert('Updateing')
-
-    interlockForm.put(route('interlock_line.update', props.found_interlock.id),
+const updateComponentLine = () => {
+    componentForm.put(route('interlock_line.update', props.component_line.id),
         {
             preserveScroll: true,
             onSuccess: () => {
@@ -69,25 +58,6 @@ const updateInterlockLine= () => {
         }
     );
 }
-*/
-
-
-const updateInterlockLine = () => {
-    interlockForm.put(route('interlock_line.update', props.interlock_line.id),
-        {
-            preserveScroll: true,
-            onSuccess: () => {
-                alert('Updated')
-            },
-        }
-    );
-}
-
-
-
-
-//const roles_permissions = computed(() => usePage().props.roles_permissions);
-//const can_manage_users = computed(() => usePage().props.roles_permissions.permissions.includes("manage_users"));
 
 const viewDownTimeModal = ref(false);
 
@@ -111,33 +81,16 @@ const viewDefectDetail = () => {
 };
 
 
-
-/*
-const createInterlockLine = () => {
-
-    form.post(route('interlock_line.store'), {
-        preserveScroll: true,
-        onSuccess: () => {
-            //swal(usePage().props.jetstream.flash?.banner || '');
-            close();
-        },
-
-        onError: (e) => {
-            console.log(e);
-        },
-    });
-};
-*/
 const people = [
     { name: 'Lindsay Walton', title: 'Front-end Developer', email: 'lindsay.walton@example.com', role: 'Member' },
 ]
 </script>
 
 <template>
-    <AppLayout title="InterLock Line">
+    <AppLayout title="Component Line">
         <template #header>
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-                Interlock Line / <span class="text-indigo-400">{{ interlock_line.id }}</span>
+                {{component}} Line / <span class="text-indigo-400">{{ component_line.id }}</span>
             </h2>
         </template>
 
@@ -148,12 +101,12 @@ const people = [
                     <div>
                         <div class="m-3 p-3">
                             <form>
-                                <div class="text-lg mb-4 text-indigo-400">Interlock Line</div>
+                                <div class="text-lg mb-4 text-indigo-400">{{component}} Line</div>
                                 <div class="space-y-12">
 
                                     <div class="grid grid-cols-1 gap-x-8 gap-y-10 border-b border-gray-900/10 pb-12 md:grid-cols-3">
                                         <div>
-                                            <h2 class="text-base font-semibold leading-7 text-gray-900">Interlock Line Details</h2>
+                                            <h2 class="text-base font-semibold leading-7 text-gray-900">{{component}} Line Details</h2>
                                             <p class="mt-1 text-sm leading-6 text-gray-600">Details for the specific line.</p>
                                         </div>
 
@@ -163,41 +116,41 @@ const people = [
                                             <div class="sm:col-span-3">
                                                 <label class="block text-sm font-medium leading-6 text-gray-900">Shift Type</label>
                                                 <div class="mt-2">
-                                                    {{interlock_line.line_shift.shift.name}}
+                                                    {{component_line.line_shift.shift.name}}
                                                 </div>
                                             </div>
 
                                             <div class="sm:col-span-3">
                                                 <label  class="block text-sm font-medium leading-6 text-gray-900">Shift Date</label>
                                                 <div class="mt-2">
-                                                    {{interlock_line.line_shift.shift_date}}
+                                                    {{component_line.line_shift.shift_date}}
                                                 </div>
                                             </div>
 
                                             <div class="sm:col-span-3">
                                                 <label  class="block text-sm font-medium leading-6 text-gray-900">Model</label>
                                                 <div class="mt-2">
-                                                    {{interlock_line.production_model.model}} ({{interlock_line.production_model.flex_type.name}})
+                                                    {{component_line.component.production_model.model}} ({{component_line.component.flex_type.name}})
                                                 </div>
                                             </div>
 
                                             <div class="sm:col-span-3">
-                                                <label  class="block text-sm font-medium leading-6 text-gray-900">Related Interlock</label>
+                                                <label  class="block text-sm font-medium leading-6 text-gray-900">Related {{component}}</label>
                                                 <div class="mt-2">
                                                     <dd class="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
 
-                                                        <div v-if="interlock_line.interlock">
-                                                            <div> <span class="font-bold">Model: </span> <span> {{interlock_line.interlock.production_model.model}} </span> </div>
-                                                            <div> <span class="font-bold">Value: </span> <span>{{interlock_line.interlock.interlock_value}} </span> </div>
-                                                            <div> <span class="font-bold">BOM: </span> <span>{{interlock_line.interlock.bom}} </span> </div>
-                                                            <div> <span class="font-bold">Syspro: </span> <span>{{interlock_line.interlock.syspro_code}} </span> </div>
+                                                        <div v-if="component_line.component">
+                                                            <div> <span class="font-bold">Model: </span> <span> {{component_line.component.production_model.model}} </span> </div>
+                                                            <div> <span class="font-bold">Value: </span> <span>{{component_line.component.component_value}} </span> </div>
+                                                            <div> <span class="font-bold">BOM: </span> <span>{{component_line.component.bom}} </span> </div>
+                                                            <div> <span class="font-bold">Syspro: </span> <span>{{component_line.component.syspro_code}} </span> </div>
                                                         </div>
 
                                                         <div v-else>
-                                                            <p class="font-bold text-red-600">No related interlock found. Please link to continue.</p>
+                                                            <p class="font-bold text-red-600">No related {{component}} found. Please link to continue.</p>
                                                         </div>
 
-                                                        <InputError class="mt-2" :message="interlockForm.errors.interlock_type_id"/>
+                                                        <InputError class="mt-2" :message="componentForm.errors.component_id"/>
 
 
                                                     </dd>
@@ -209,7 +162,7 @@ const people = [
                                                 <div class="mt-2">
 
                                                     <div class="">
-                                                        <select v-model="interlockForm.business_unit_id"
+                                                        <select v-model="componentForm.business_unit_id"
                                                                 class="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-indigo-600 sm:text-sm sm:leading-6">
                                                             <option v-for="n in props.all_business_units" :key="n.id" :value="n.id">
                                                                 {{n.name}}
@@ -217,7 +170,7 @@ const people = [
                                                         </select>
                                                     </div>
 
-                                                    <InputError class="mt-2" :message="interlockForm.errors.business_unit_id"/>
+                                                    <InputError class="mt-2" :message="componentForm.errors.business_unit_id"/>
                                                 </div>
                                             </div>
 
@@ -226,7 +179,7 @@ const people = [
                                                 <div class="mt-2">
 
                                                     <div class="">
-                                                        <select v-model="interlockForm.assembly_line_id"
+                                                        <select v-model="componentForm.assembly_line_id"
                                                                 class="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-indigo-600 sm:text-sm sm:leading-6">
                                                             <option v-for="n in props.all_assembly_lines" :key="n.id" :value="n.id">
                                                                 {{n.name}}
@@ -234,7 +187,7 @@ const people = [
                                                         </select>
                                                     </div>
 
-                                                    <InputError class="mt-2" :message="interlockForm.errors.business_unit_id"/>
+                                                    <InputError class="mt-2" :message="componentForm.errors.business_unit_id"/>
                                                 </div>
                                             </div>
 
@@ -243,7 +196,7 @@ const people = [
                                                 <div class="mt-2">
 
                                                     <div class="">
-                                                        <select v-model="interlockForm.shift_leader_id"
+                                                        <select v-model="componentForm.shift_leader_id"
                                                                 class="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-indigo-600 sm:text-sm sm:leading-6">
                                                             <option v-for="n in props.all_staff_members" :key="n.id" :value="n.id">
                                                                 {{n.first_name}} {{n.last_name}}
@@ -251,7 +204,7 @@ const people = [
                                                         </select>
                                                     </div>
 
-                                                    <InputError class="mt-2" :message="interlockForm.errors.business_unit_id"/>
+                                                    <InputError class="mt-2" :message="componentForm.errors.business_unit_id"/>
                                                 </div>
                                             </div>
 
@@ -260,7 +213,7 @@ const people = [
                                                 <div class="mt-2">
 
                                                     <div class="">
-                                                        <select v-model="interlockForm.operator_id"
+                                                        <select v-model="componentForm.operator_id"
                                                                 class="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-indigo-600 sm:text-sm sm:leading-6">
                                                             <option v-for="n in props.all_staff_members" :key="n.id" :value="n.id">
                                                                 {{n.first_name}} {{n.last_name}}
@@ -268,7 +221,7 @@ const people = [
                                                         </select>
                                                     </div>
 
-                                                    <InputError class="mt-2" :message="interlockForm.errors.business_unit_id"/>
+                                                    <InputError class="mt-2" :message="componentForm.errors.business_unit_id"/>
                                                 </div>
                                             </div>
 
@@ -277,9 +230,9 @@ const people = [
                                                 <div class="mt-2">
 
                                                     <div class="">
-                                                        <input v-model="interlockForm.prod_plan" type="number"
+                                                        <input v-model="componentForm.prod_plan" type="number"
                                                                class="block w-32 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"/>
-                                                        <InputError class="mt-2" :message="interlockForm.errors.prod_plan"/>
+                                                        <InputError class="mt-2" :message="componentForm.errors.prod_plan"/>
                                                     </div>
                                                 </div>
                                             </div>
@@ -289,9 +242,9 @@ const people = [
                                                 <div class="mt-2">
 
                                                     <div class="">
-                                                        <input v-model="interlockForm.prod_actual" type="number"
+                                                        <input v-model="componentForm.prod_actual" type="number"
                                                                class="block w-32 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"/>
-                                                        <InputError class="mt-2" :message="interlockForm.errors.prod_actual"/>
+                                                        <InputError class="mt-2" :message="componentForm.errors.prod_actual"/>
                                                     </div>
                                                 </div>
                                             </div>
@@ -301,10 +254,10 @@ const people = [
                                                 <div class="mt-2">
 
                                                     <div class="">
-                                                        <input v-model="interlockForm.man_input" type="number"
+                                                        <input v-model="componentForm.man_input" type="number"
                                                                class="block w-32 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"/>
 
-                                                        <InputError class="mt-2" :message="interlockForm.errors.man_input"/>
+                                                        <InputError class="mt-2" :message="componentForm.errors.man_input"/>
                                                     </div>
                                                 </div>
                                             </div>
@@ -312,16 +265,16 @@ const people = [
                                             <div class="sm:col-span-3">
                                                 <label class="block text-sm font-medium leading-6 text-gray-900">Job Card</label>
                                                 <div class="mt-2">
-                                                    <input v-model="interlockForm.job_card_no" type="text"
+                                                    <input v-model="componentForm.job_card_no" type="text"
                                                            class="block w-48 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"/>
 
-                                                    <InputError class="mt-2" :message="interlockForm.errors.job_card_no"/>
+                                                    <InputError class="mt-2" :message="componentForm.errors.job_card_no"/>
                                                 </div>
                                             </div>
 
                                             <div class="sm:col-span-6">
                                                 <div class="mt-6 flex items-center justify-end gap-x-6">
-                                                    <secondary-button @click.prevent="updateInterlockLine" class="mt-3">Update</secondary-button>
+                                                    <secondary-button @click.prevent="updateComponentLine" class="mt-3">Update</secondary-button>
                                                 </div>
                                             </div>
 
@@ -342,8 +295,8 @@ const people = [
                                             <div class="px-4 sm:px-6 lg:px-8">
                                                 <div class="sm:flex sm:items-center">
                                                     <div class="sm:flex-auto">
-                                                        <h1 class="text-base font-semibold leading-6 text-gray-900">Interlock Line</h1>
-                                                        <p class="mt-2 text-sm text-gray-700">Interlock Line Calculated Values</p>
+                                                        <h1 class="text-base font-semibold leading-6 text-gray-900">{{component}} Line</h1>
+                                                        <p class="mt-2 text-sm text-gray-700">{{component}} Line Calculated Values</p>
                                                     </div>
                                                     <div class="mt-4 sm:ml-16 sm:mt-0 sm:flex-none">
                                                         <button type="button" class="block rounded-md bg-indigo-600 px-3 py-2 text-center text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">Export</button>
@@ -362,40 +315,40 @@ const people = [
                                                                 <tbody class="divide-y divide-gray-200 bg-white">
                                                                 <tr>
                                                                     <td class="whitespace-nowrap py-2 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-0">Product QTY Loss</td>
-                                                                    <td class="whitespace-nowrap px-2 py-2 text-sm font-medium text-gray-900">{{interlock_line.prod_qty_loss}}</td>
+                                                                    <td class="whitespace-nowrap px-2 py-2 text-sm font-medium text-gray-900">{{component_line.prod_qty_loss}}</td>
                                                                 </tr>
                                                                 <tr>
                                                                     <td class="whitespace-nowrap py-2 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-0">Daily Plan vs Actual</td>
-                                                                    <td class="whitespace-nowrap px-2 py-2 text-sm font-medium text-gray-900">{{Math.round(interlock_line.prod_percent_loss)}}%</td>
+                                                                    <td class="whitespace-nowrap px-2 py-2 text-sm font-medium text-gray-900">{{Math.round(component_line.daily_plan_vs_actual)}}%</td>
                                                                 </tr>
                                                                 <tr>
                                                                     <td class="whitespace-nowrap py-2 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-0">Work Time</td>
-                                                                    <td class="whitespace-nowrap px-2 py-2 text-sm font-medium text-gray-900">{{Math.round(interlock_line.work_time)}}</td>
+                                                                    <td class="whitespace-nowrap px-2 py-2 text-sm font-medium text-gray-900">{{Math.round(component_line.work_time)}}</td>
                                                                 </tr>
                                                                 <tr>
                                                                     <td class="whitespace-nowrap px-2 py-2 text-sm font-medium text-gray-900 sm:pl-0">Work Down Time</td>
-                                                                    <td class="whitespace-nowrap px-2 py-2 text-sm font-medium text-gray-900">{{interlock_line.work_down_time}}</td>
+                                                                    <td class="whitespace-nowrap px-2 py-2 text-sm font-medium text-gray-900">{{component_line.work_down_time}}</td>
                                                                 </tr>
                                                                 <tr>
                                                                     <td class="whitespace-nowrap px-2 py-2 text-sm font-medium text-gray-900 sm:pl-0">Total Defect Qty Incl</td>
-                                                                    <td class="whitespace-nowrap px-2 py-2 text-sm font-medium text-gray-900">{{interlock_line.total_defect_qty_inc}}</td>
+                                                                    <td class="whitespace-nowrap px-2 py-2 text-sm font-medium text-gray-900">{{component_line.total_defect_qty_inc}}</td>
                                                                 </tr>
                                                                 <tr>
                                                                     <td class="whitespace-nowrap py-2 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-0">Total defect excl in kg</td>
-                                                                    <td class="whitespace-nowrap px-2 py-2 text-sm font-medium text-gray-900">{{interlock_line.total_defect_kg_ex}}</td>
+                                                                    <td class="whitespace-nowrap px-2 py-2 text-sm font-medium text-gray-900">{{component_line.total_defect_kg_ex}}</td>
                                                                 </tr>
                                                                 <tr>
                                                                     <td class="whitespace-nowrap px-2 py-2 text-sm font-medium text-gray-900 sm:pl-0">Total defect QTY Ex</td>
-                                                                    <td class="whitespace-nowrap px-2 py-2 text-sm font-medium text-gray-900">{{interlock_line.total_defect_qty_conv_ex + interlock_line.total_defect_qty_ex}}</td>
+                                                                    <td class="whitespace-nowrap px-2 py-2 text-sm font-medium text-gray-900">{{component_line.total_defect_qty_conv_ex + component_line.total_defect_qty_ex}}</td>
                                                                 </tr>
                                                                 <tr>
                                                                     <td class="whitespace-nowrap py-2 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-0">Defect % Inc</td>
                                                                     <td class="whitespace-nowrap px-2 py-2 text-sm font-medium text-gray-900">
-                                                                        {{ (interlock_line.total_defect_percent_inc * 100).toFixed(2) }} %
+                                                                        {{ (component_line.total_defect_percent_inc * 100).toFixed(2) }} %
                                                                     </td>
                                                                 </tr><tr>
                                                                     <td class="whitespace-nowrap px-2 py-2 text-sm font-medium text-gray-900 sm:pl-0">Defect % Excl</td>
-                                                                    <td class="whitespace-nowrap px-2 py-2 text-sm font-medium text-gray-900">{{(interlock_line.total_defect_percent_ex * 100).toFixed(2)}} %</td>
+                                                                    <td class="whitespace-nowrap px-2 py-2 text-sm font-medium text-gray-900">{{(component_line.total_defect_percent_ex * 100).toFixed(2)}} %</td>
                                                                 </tr>
                                                                 </tbody>
                                                             </table>
@@ -421,20 +374,20 @@ const people = [
 
                 <br>
 
-                <div v-if="interlock_line.interlock" class="bg-white overflow-hidden shadow-xl sm:rounded-lg">
+                <div v-if="component_line.component" class="bg-white overflow-hidden shadow-xl sm:rounded-lg">
 
                     <div>
-                        <DownTimeModal :show="viewDownTimeModal" :line_shift_id="interlock_line.line_shift_id" :interlock_line_id="interlock_line.id"  @close="closeDownTime"/>
+                        <DownTimeModal :show="viewDownTimeModal" :line_shift_id="component_line.line_shift_id" :interlock_line_id="component_line.id"  @close="closeDownTime"/>
 
                         <div class="m-3 p-3">
 
-                            <div class="text-lg mb-4 text-indigo-400">Interlock Down time</div>
+                            <div class="text-lg mb-4 text-indigo-400">{{component}} Down time</div>
 
                             <div class="px-4 sm:px-6 lg:px-8">
                                 <div class="sm:flex sm:items-center">
                                     <div class="sm:flex-auto">
                                         <h1 class="text-base font-semibold leading-6 text-gray-900">All Down times</h1>
-                                        <p class="mt-2 text-sm text-gray-700">List of all down times loaded to the specific interlock.</p>
+                                        <p class="mt-2 text-sm text-gray-700">List of all down times loaded to the specific {{component}}.</p>
                                     </div>
                                     <div class="mt-4 sm:ml-16 sm:mt-0 sm:flex-none">
                                         <button type="button" class="block rounded-md bg-indigo-600 px-3 py-2 text-center text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600" @click="viewDownTimeDetail">Add down time</button>
@@ -483,20 +436,20 @@ const people = [
 
                 <br>
 
-                <div v-if="interlock_line.interlock"  class="bg-white overflow-hidden shadow-xl sm:rounded-lg">
+                <div v-if="component_line.component"  class="bg-white overflow-hidden shadow-xl sm:rounded-lg">
 
                     <div>
-                        <DefectModal :show="viewDefectModal" :line_shift_id="interlock_line.line_shift_id"
-                                     :interlock_line_id="interlock_line.id" :production_model_type_id="interlock_line.production_model_type_id" :interlock_type_id="interlock_line.interlock_type_id"  @close="closeDefect"> </DefectModal>
+                        <DefectModal :show="viewDefectModal" :line_shift_id="component_line.line_shift_id"
+                                     :component_line_id="component_line.id" :component="component" @close="closeDefect"> </DefectModal>
                         <div class="m-3 p-3">
 
-                            <div class="text-lg mb-4 text-indigo-400">Interlock Defect</div>
+                            <div class="text-lg mb-4 text-indigo-400">{{component}} Defect</div>
 
                             <div class="px-4 sm:px-6 lg:px-8">
                                 <div class="sm:flex sm:items-center">
                                     <div class="sm:flex-auto">
                                         <h1 class="text-base font-semibold leading-6 text-gray-900">All Defects</h1>
-                                        <p class="mt-2 text-sm text-gray-700">List of all defects loaded to the specific interlock.</p>
+                                        <p class="mt-2 text-sm text-gray-700">List of all defects loaded to the specific {{component}}.</p>
                                     </div>
                                     <div class="mt-4 sm:ml-16 sm:mt-0 sm:flex-none">
                                         <button type="button" class="block rounded-md bg-indigo-600 px-3 py-2 text-center text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600" @click="viewDefectDetail">Add defect</button>
@@ -522,7 +475,7 @@ const people = [
                                                 </thead>
                                                 <tbody class="divide-y divide-gray-200">
                                                 <tr v-for="defect in defects" :key="defect.id">
-                                                    <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-0">{{defect.defect_group.value}}</td>
+                                                    <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-0">{{defect.defect_type.defect_group.value}}</td>
                                                     <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{defect.defect_type.value}}</td>
                                                     <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{defect.defect_basis.value}}</td>
                                                     <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">

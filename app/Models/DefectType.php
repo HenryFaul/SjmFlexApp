@@ -7,15 +7,15 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class InterlockDefectType extends Model
+class DefectType extends Model
 {
     use SoftDeletes;
     use HasFactory;
 
-    public $fillable = ['value','comment','is_active','is_material_error','import_pos'];
+    public $fillable = ['value','comment','is_active','is_material_error','import_pos','component'];
 
-    public function InterlockDefectGroup(): BelongsTo
+    public function DefectGroup(): BelongsTo
     {
-        return $this->belongsTo(InterlockDefectGroup::class, 'interlock_defect_group_id');
+        return $this->belongsTo(DefectGroup::class, 'defect_group_id');
     }
 }

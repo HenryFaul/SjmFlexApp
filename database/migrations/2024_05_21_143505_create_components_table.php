@@ -13,27 +13,22 @@ return new class extends Migration
      */
     public function up()
     {
-
-        //'model','tubing_value','braiding_type_id','flex_type_id','bom','syspro_code','is_active'
-
-        Schema::create('braidings', function (Blueprint $table) {
+        Schema::create('components', function (Blueprint $table) {
             $table->id();
-
+            $table->string('component');
             $table->bigInteger('model_type_id')->unsigned();
             $table->foreign('model_type_id')
                 ->references('id')->on('production_models')->onDelete('cascade');
 
-
-            $table->double('tubing_value')->default(0);
-
-            $table->bigInteger('braiding_type_id')->unsigned();
-            $table->foreign('braiding_type_id')
-                ->references('id')->on('braiding_types')->onDelete('cascade');
-
-
+            $table->double('component_value')->default(0);
+            $table->string('component_type')->nullable();
             $table->bigInteger('flex_type_id')->unsigned();
             $table->foreign('flex_type_id')
                 ->references('id')->on('flex_types')->onDelete('cascade');
+
+            $table->string('location')->nullable();
+            $table->string('cutting_type')->nullable();
+            $table->integer('corr')->nullable();
 
             $table->double('bom')->default(0);
             $table->string('syspro_code')->nullable();
@@ -41,8 +36,6 @@ return new class extends Migration
             $table->boolean('is_active')->default(1);
             $table->softDeletes();
             $table->timestamps();
-
-            $table->unique(['model_type_id','flex_type_id']);
         });
     }
 
@@ -53,6 +46,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('braidings');
+        Schema::dropIfExists('components');
     }
 };

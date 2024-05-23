@@ -6,10 +6,10 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class LocationType extends Model
+class DownTimeType extends Model
 {
-    use HasFactory;
     use SoftDeletes;
+    use HasFactory;
 
-    public $fillable = ['name'];
+    public $fillable = ['type','comment','is_active','component'];
 }

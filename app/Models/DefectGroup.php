@@ -6,11 +6,10 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class InterlockType extends Model
+class DefectGroup extends Model
 {
     use SoftDeletes;
     use HasFactory;
 
-    public $fillable = ['name'];
+    public $fillable = ['value','comment','component'];
 }
-

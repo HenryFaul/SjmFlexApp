@@ -20,9 +20,9 @@ const props = defineProps({
     show:false,
     closeable:true,
     line_shift_id: Number,
-    interlock_line_id:Number,
+    component_line_id:Number,
+    component:String,
     production_model_type_id:Number,
-    interlock_type_id:Number
 });
 
 
@@ -60,11 +60,10 @@ const getComponentProps = () => {
 
 const form = useForm({
     line_shift_id:props.line_shift_id,
-    interlock_line_id:props.interlock_line_id,
-    production_model_type_id:props.production_model_type_id,
-    interlock_type_id:props.interlock_type_id,
-    interlock_defect_group_type_id:1,
-    interlock_defect_type_id:1,
+    component_line_id:props.component_line_id,
+    component:props.component,
+    defect_group_type_id:1,
+    defect_type_id:1,
     defect_bases_type_id:1,
     value:0,
     salvage_value:0,
@@ -115,21 +114,20 @@ let borderClass = computed(() => !emptyErrors ? 'ml-4 mt-4 p-4 rounded-md border
 
                                 <div class="text-lg mb-2 text-indigo-400">New Defect</div>
 
-                                {{form.interlock_type_id}}
 
 
                                 <div class="mt-3">
 
                                     <label class="block text-sm font-medium leading-6 text-gray-900">Defect Group</label>
 
-                                    <select v-model="form.interlock_defect_group_type_id"
+                                    <select v-model="form.defect_group_type_id"
                                             class="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-indigo-600 sm:text-sm sm:leading-6">
                                         <option v-for="n in defectProps['all_interlock_defect_groups']" :key="n.id" :value="n.id">
                                             {{n.value}}
                                         </option>
                                     </select>
 
-                                    <InputError class="mt-2" :message="form.errors.interlock_defect_group_type_id"/>
+                                    <InputError class="mt-2" :message="form.errors.defect_group_type_id"/>
 
                                 </div>
 
@@ -137,14 +135,14 @@ let borderClass = computed(() => !emptyErrors ? 'ml-4 mt-4 p-4 rounded-md border
 
                                     <label class="block text-sm font-medium leading-6 text-gray-900">Defect Type</label>
 
-                                    <select v-model="form.interlock_defect_type_id"
+                                    <select v-model="form.defect_type_id"
                                             class="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-indigo-600 sm:text-sm sm:leading-6">
                                         <option v-for="n in defectProps['all_interlock_defect_types']" :key="n.id" :value="n.id">
                                             {{n.value}}
                                         </option>
                                     </select>
 
-                                    <InputError class="mt-2" :message="form.errors.interlock_defect_type_id"/>
+                                    <InputError class="mt-2" :message="form.errors.defect_type_id"/>
 
                                 </div>
 

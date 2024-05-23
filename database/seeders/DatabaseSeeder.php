@@ -9,9 +9,9 @@ use App\Models\BusinessUnit;
 use App\Models\CuttingType;
 use App\Models\DefectBasis;
 use App\Models\FlexType;
-use App\Models\InterlockDefectGroup;
-use App\Models\InterlockDefectType;
-use App\Models\InterlockDownTimeType;
+use App\Models\DefectGroup;
+use App\Models\DefectType;
+use App\Models\DownTimeType;
 use App\Models\InterlockType;
 use App\Models\InternalReturnType;
 use App\Models\LocationType;
@@ -49,7 +49,6 @@ class DatabaseSeeder extends Seeder
 
         //Shift
         //6-2	2-10	10-6
-
         Shift::create([
             'name' => 'unallocated',
         ]);
@@ -107,57 +106,6 @@ class DatabaseSeeder extends Seeder
             'model' => 'unallocated',
             'flex_type_id'=>4,
             'is_active'=>true
-        ]);
-        //CuttingType
-
-        CuttingType::create([
-            'name' => 'laser',
-        ]);
-
-        CuttingType::create([
-            'name' => 'plasma',
-        ]);
-
-        //InterlockType
-
-        InterlockType::create([
-            'name' => 'unallocated',
-        ]);
-
-        InterlockType::create([
-            'name' => 'Cut Pieces',
-        ]);
-
-        InterlockType::create([
-            'name' => 'Finished Goods',
-        ]);
-
-
-        //BraidingType
-        BraidingType::create([
-            'name' => 'unallocated',
-        ]);
-
-        BraidingType::create([
-            'name' => 'OB Cut Pcs',
-        ]);
-
-        BraidingType::create([
-            'name' => 'IB',
-        ]);
-
-        //LocationType
-
-        LocationType::create([
-            'name' => 'unallocated',
-        ]);
-
-        LocationType::create([
-            'name' => 'local',
-        ]);
-
-        LocationType::create([
-            'name' => 'export',
         ]);
 
         //Business Units
@@ -238,10 +186,6 @@ class DatabaseSeeder extends Seeder
             'staff_clock_no'=>'1234'
         ]);
 
-        //InterlockDownTimeType
-        // public $fillable = ['type','comment','is_active'];
-
-
 /*        •	Mechanical
 •	Electrical
 •	Settings
@@ -253,45 +197,55 @@ class DatabaseSeeder extends Seeder
 •	Changeover*/
 
 
-        InterlockDownTimeType::create([
+        DownTimeType::create([
             'type' => 'unallocated',
+            'component' => 'Interlock'
         ]);
 
-        InterlockDownTimeType::create([
+        DownTimeType::create([
             'type' => 'Mechanical',
+            'component' => 'Interlock'
         ]);
 
-        InterlockDownTimeType::create([
+        DownTimeType::create([
             'type' => 'Electrical',
+            'component' => 'Interlock'
         ]);
 
-        InterlockDownTimeType::create([
+        DownTimeType::create([
             'type' => 'Settings',
+            'component' => 'Interlock'
         ]);
 
 
-        InterlockDownTimeType::create([
+        DownTimeType::create([
             'type' => 'Health & Safety',
+            'component' => 'Interlock'
         ]);
 
-        InterlockDownTimeType::create([
+        DownTimeType::create([
             'type' => 'Waiting for Operator',
+            'component' => 'Interlock'
         ]);
 
-        InterlockDownTimeType::create([
+        DownTimeType::create([
             'type' => 'Material',
+            'component' => 'Interlock'
         ]);
 
-        InterlockDownTimeType::create([
+        DownTimeType::create([
             'type' => 'Management',
+            'component' => 'Interlock'
         ]);
 
-        InterlockDownTimeType::create([
+        DownTimeType::create([
             'type' => 'Projects',
+            'component' => 'Interlock'
         ]);
 
-        InterlockDownTimeType::create([
+        DownTimeType::create([
             'type' => 'Changeover',
+            'component' => 'Interlock'
         ]);
 
 
@@ -315,24 +269,28 @@ class DatabaseSeeder extends Seeder
 •	Induction Heating
 •	Interlock Clamping*/
 
-        InterlockDefectGroup::create([
+        DefectGroup::create([
             'value' => 'unallocated',
         ]);
 
-        InterlockDefectGroup::create([
+        $InterlockFormingGroup = DefectGroup::create([
             'value' => 'Interlock Forming',
+            'component' => 'Interlock'
         ]);
 
-        InterlockDefectGroup::create([
+        DefectGroup::create([
             'value' => 'Spot Welding',
+            'component' => 'Interlock'
         ]);
 
-        InterlockDefectGroup::create([
+        DefectGroup::create([
             'value' => 'Induction Heating',
+            'component' => 'Interlock'
         ]);
 
-        InterlockDefectGroup::create([
+        DefectGroup::create([
             'value' => 'Interlock Clamping',
+            'component' => 'Interlock'
         ]);
 
         //InternalReturnType
@@ -416,113 +374,176 @@ class DatabaseSeeder extends Seeder
         cracks/ holes/dents/edge damage
         Damage/ bad cutting/clamping damage*/
 
-        InterlockDefectType::create([
+        DefectType::create([
             'value' => 'unallocated',
+            'component' => 'Interlock'
         ]);
 
-        InterlockDefectType::create([
+        DefectType::create([
+            'value' => 'Excessive Burr',
+            'component' => 'Interlock',
+            'defect_group_id' => $InterlockFormingGroup->id,
+            'import_pos' => 34
+        ]);
+
+        DefectType::create([
             'value' => 'Coil Width Too Big',
+            'component' => 'Interlock',
+            'defect_group_id' => $InterlockFormingGroup->id,
+            'import_pos' => 36
         ]);
 
-        InterlockDefectType::create([
+        DefectType::create([
             'value' => 'Damaged Coil',
+            'component' => 'Interlock',
+            'defect_group_id' => $InterlockFormingGroup->id,
+            'import_pos' => 38
         ]);
 
-        InterlockDefectType::create([
+        DefectType::create([
             'value' => 'Coil Change / Change Over',
+            'component' => 'Interlock',
+            'defect_group_id' => $InterlockFormingGroup->id,
+            'import_pos' => 40
         ]);
 
-        InterlockDefectType::create([
+        DefectType::create([
             'value' => 'Roll Off',
+            'component' => 'Interlock',
+            'defect_group_id' => $InterlockFormingGroup->id,
+            'import_pos' => 42
         ]);
 
-        InterlockDefectType::create([
+        DefectType::create([
             'value' => 'Roll Up',
+            'component' => 'Interlock',
+            'defect_group_id' => $InterlockFormingGroup->id,
+            'import_pos' => 44
         ]);
 
-        InterlockDefectType::create([
+        DefectType::create([
             'value' => 'Friction Hard/Soft',
+            'component' => 'Interlock',
+            'defect_group_id' => $InterlockFormingGroup->id,
+            'import_pos' => 46
         ]);
 
-        InterlockDefectType::create([
+        DefectType::create([
             'value' => 'Closed Corrugation / tails',
+            'component' => 'Interlock',
+            'defect_group_id' => $InterlockFormingGroup->id,
+            'import_pos' => 48
         ]);
 
-        InterlockDefectType::create([
+        DefectType::create([
             'value' => 'Vuvuzela/pitch to small',
+            'component' => 'Interlock',
+            'defect_group_id' => $InterlockFormingGroup->id,
+            'import_pos' => 50
         ]);
 
-        InterlockDefectType::create([
+        DefectType::create([
             'value' => 'Cutting Length Long/Short',
+            'component' => 'Interlock',
+            'defect_group_id' => $InterlockFormingGroup->id,
+            'import_pos' => 52
         ]);
 
-        InterlockDefectType::create([
+        DefectType::create([
             'value' => 'Bad/Skew Cutting',
+            'component' => 'Interlock',
+            'defect_group_id' => $InterlockFormingGroup->id,
+            'import_pos' => 54
         ]);
 
-        InterlockDefectType::create([
+        DefectType::create([
             'value' => 'Spot Weld Holes',
+            'component' => 'Interlock',
+            'defect_group_id' => 1,
         ]);
 
-        InterlockDefectType::create([
+        DefectType::create([
             'value' => 'Spot Weld high/low Cracks',
+            'component' => 'Interlock',
+            'defect_group_id' => 1,
         ]);
 
-        InterlockDefectType::create([
+        DefectType::create([
             'value' => 'Spot Weld Damage',
+            'component' => 'Interlock',
+            'defect_group_id' => 1,
         ]);
 
-        InterlockDefectType::create([
+        DefectType::create([
             'value' => 'Damaged',
+            'component' => 'Interlock',
+            'defect_group_id' => 1,
         ]);
 
-        InterlockDefectType::create([
+        DefectType::create([
             'value' => 'Burn Away',
+            'component' => 'Interlock',
+            'defect_group_id' => 1,
         ]);
 
-        InterlockDefectType::create([
+        DefectType::create([
             'value' => 'High/Low Ring Position',
+            'component' => 'Interlock',
+            'defect_group_id' => 1,
         ]);
 
-        InterlockDefectType::create([
+        DefectType::create([
             'value' => 'Ring cracks/damage rings',
+            'component' => 'Interlock',
+            'defect_group_id' => 1,
         ]);
 
-        InterlockDefectType::create([
+        DefectType::create([
             'value' => 'Double Ring / gaps / skew /twisted',
+            'component' => 'Interlock',
+            'defect_group_id' => 1,
         ]);
 
-        InterlockDefectType::create([
+        DefectType::create([
             'value' => 'OD too Small/Big',
+            'component' => 'Interlock',
+            'defect_group_id' => 1,
         ]);
 
-        InterlockDefectType::create([
+        DefectType::create([
             'value' => 'Tails/ loose wires/ twisted',
+            'component' => 'Interlock',
+            'defect_group_id' => 1,
         ]);
 
-        InterlockDefectType::create([
+        DefectType::create([
             'value' => 'Length Short/long',
+            'component' => 'Interlock',
+            'defect_group_id' => 1,
         ]);
 
-        InterlockDefectType::create([
+        DefectType::create([
             'value' => 'Closed Corrugation2',
+            'component' => 'Interlock',
+            'defect_group_id' => 1,
         ]);
 
-        InterlockDefectType::create([
+        DefectType::create([
             'value' => 'Friction Hard/ soft',
+            'component' => 'Interlock',
+            'defect_group_id' => 1,
         ]);
 
-        InterlockDefectType::create([
+        DefectType::create([
             'value' => 'cracks/ holes/dents/edge damage',
+            'component' => 'Interlock',
+            'defect_group_id' => 1,
         ]);
 
-        InterlockDefectType::create([
+        DefectType::create([
             'value' => 'Damage/ bad cutting/clamping damage',
+            'component' => 'Interlock',
+            'defect_group_id' => 1,
         ]);
-
-
-
-
-
     }
 }

@@ -2,16 +2,16 @@
 
 namespace App\Http\Controllers;
 
-use App\Charts\InterlockDefectChart;
-use App\Charts\InterlockDownTimeChart;
-use App\Charts\InterlockPlanVsActualChart;
+use App\Charts\DefectChart;
+use App\Charts\DownTimeChart;
+use App\Charts\PlanVsActualChart;
 use App\Charts\MonthlyUsersChart;
 use App\Models\AssemblyLine;
 use App\Models\BusinessUnit;
-use App\Models\Interlock;
-use App\Models\InterlockDefect;
-use App\Models\InterlockDownTime;
-use App\Models\InterlockLine;
+use App\Models\Component;
+use App\Models\ComponentLine;
+use App\Models\ComponentDefect;
+use App\Models\ComponentDownTime;
 use App\Models\LineShift;
 use App\Models\ProductionModel;
 use App\Models\StaffMember;
@@ -21,7 +21,7 @@ use Illuminate\Http\Request;
 class InterlockLineController extends Controller
 {
 
-    public function monthToDate(Request $request, InterlockPlanVsActualChart $chart, InterlockDefectChart $chart2, InterlockDownTimeChart $chart3): \Inertia\Response|\Inertia\ResponseFactory
+    public function monthToDate(Request $request, PlanVsActualChart $chart, DefectChart $chart2, DownTimeChart $chart3): \Inertia\Response|\Inertia\ResponseFactory
     {
         $request->validate([
             'start_date' => 'nullable|date',
@@ -34,15 +34,13 @@ class InterlockLineController extends Controller
         $flexType = $request->input('flex_type', 2);
 
         return inertia(
-            'InterlockLine/MonthToDate',
+            'ComponentLine/MonthToDate',
             [
-                'chart' => $chart->build($flexType,'2023-08-01','2023-08-05'),
-                'chart2' => $chart2->build($flexType,'2023-08-01','2023-08-05'),
-                'chart3' => $chart3->build($flexType,'2023-08-01','2023-08-05'),
+                'chart' => $chart->build("Interlock",$flexType,$startDate,$endDate),
+                'chart2' => $chart2->build("Interlock",$flexType,$startDate,$endDate),
+                'chart3' => $chart3->build("Interlock",$flexType,$startDate,$endDate),
             ]
         );
-
-
     }
 
 
@@ -53,10 +51,6 @@ class InterlockLineController extends Controller
      */
     public function index(Request $request)
     {
-        //
-
-        //all_interlock_line_items
-
         $filters = $request->only([
             'searchName',
             'isActive',
@@ -65,10 +59,10 @@ class InterlockLineController extends Controller
         ]);
 
         $paginate = $request['show'] ?? 10;
-        $all_interlock_line_items = InterlockLine::where('id', '>', 0)->with('LineShift', fn($query) => $query->with('Shift'))->with('ProductionModel')->with('Interlock')->paginate($paginate)->withQueryString();
+        $all_interlock_line_items = ComponentLine::where('component','Interlock')->where('id', '>', 0)->with('LineShift', fn($query) => $query->with('Shift'))->with('Component.ProductionModel')->paginate($paginate)->withQueryString();
 
         return inertia(
-            'InterlockLine/Index',
+            'ComponentLine/Index',
             [
                 'filters' => $filters,
                 'all_interlock_line_items' => $all_interlock_line_items,
@@ -85,25 +79,26 @@ class InterlockLineController extends Controller
     {
 
         //'job_card_no','production_model_type_id','shift_leader_id','operator_id','business_unit_id','assembly_line_id'
+        $component = "Interlock";
         $all_line_shifts = LineShift::where('id', '>=', 0)->with('Shift')->get();
         $all_production_models = ProductionModel::with('FlexType')->get();
         $all_staff_members = StaffMember::all();
         $all_business_units = BusinessUnit::all();
         $all_assembly_lines = AssemblyLine::all();
-        $all_interlocks = Interlock::where('id', '>=', 0)->with('ProductionModel', fn($query) => $query->with('FlexType'))->get();
+        $all_interlocks = Component::where('component',$component)->where('id', '>=', 0)->with('ProductionModel', fn($query) => $query->with('FlexType'))->get();
 
         //fn($query) => $query->with('FlexType')
 
         return inertia(
-            'InterlockLine/Create',
+            'ComponentLine/Create',
             [
                 'all_line_shifts' => $all_line_shifts,
                 'all_production_models' => $all_production_models,
                 'all_staff_members' => $all_staff_members,
                 'all_business_units' => $all_business_units,
                 'all_assembly_lines' => $all_assembly_lines,
-                'all_interlocks' => $all_interlocks
-
+                'all_components' => $all_interlocks,
+                'component' => $component,
             ]
         );
     }
@@ -122,7 +117,7 @@ class InterlockLineController extends Controller
         $request->validate([
             'job_card_no' => ['required', 'string'],
             'line_shift_id' => ['required', 'integer', 'exists:line_shifts,id'],
-            'interlock_type_id' => ['required', 'integer', 'exists:interlocks,id'],
+            'component_id' => ['required', 'integer', 'exists:components,id'],
             'production_model_type_id' => ['required', 'integer', 'exists:production_models,id'],
             'shift_leader_id' => ['required', 'integer', 'exists:staff_members,id'],
             'operator_id' => ['required', 'integer', 'exists:staff_members,id'],
@@ -133,11 +128,12 @@ class InterlockLineController extends Controller
 
         $production_model = ProductionModel::where('id', $request->production_model_type_id)->first();
 
-        $interlock_line = InterlockLine::create([
+        $interlock_line = ComponentLine::create([
+            'component' => 'Interlock', // 'Interlock
             'job_card_no' => $request->job_card_no,
             'flex_type_id' => $production_model->flex_type_id,
             'line_shift_id' => $request->line_shift_id,
-            'interlock_type_id' => $request->interlock_type_id,
+            'component_id' => $request->component_id,
             'production_model_type_id' => $request->production_model_type_id,
             'shift_leader_id' => $request->shift_leader_id,
             'operator_id' => $request->operator_id,
@@ -160,31 +156,32 @@ class InterlockLineController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param \App\Models\InterlockLine $interlockLine
+     * @param \App\Models\ComponentLine $interlockLine
      * @return \Inertia\Response|\Inertia\ResponseFactory
      */
-    public function show(InterlockLine $interlockLine): \Inertia\Response|\Inertia\ResponseFactory
+    public function show(ComponentLine $interlockLine): \Inertia\Response|\Inertia\ResponseFactory
     {
 
-        $interlockLine = InterlockLine::where('id', $interlockLine->id)->with('LineShift', fn($query) => $query->with('Shift'))->with('ProductionModel', fn($query) => $query->with('FlexType'))
-            ->with('Interlock', fn($query) => $query->with('ProductionModel')->with('FlexType')->with('Location')->with('CuttingType'))->first();
+        $interlockLine = ComponentLine::where('id', $interlockLine->id)
+            ->with('LineShift', fn($query) => $query->with('Shift'))
+            ->with('Component', fn($query) => $query->with('ProductionModel')->with('FlexType'))
+            ->first();
 
         $all_staff_members = StaffMember::all();
         $all_business_units = BusinessUnit::all();
         $all_assembly_lines = AssemblyLine::all();
-        $down_times = InterlockDownTime::where('interlock_line_id', $interlockLine->id)->with('DownTimeType')->get();
-        $defects = InterlockDefect::where('interlock_line_id', $interlockLine->id)->with('DefectType')->with('DefectGroup')->with('DefectBasis')->get();
-
-        $production_model = $interlockLine->ProductionModel;
+        $down_times = ComponentDownTime::where('component_line_id', $interlockLine->id)->with('DownTimeType')->get();
+        $defects = ComponentDefect::where('component_line_id', $interlockLine->id)->with('DefectType.DefectGroup')->with('DefectBasis')->get();
 
         // $found_interlock = Interlock::where('model_type_id',$production_model->id)->where('flex_type_id',$production_model->flex_type_id)->with('ProductionModel')->with('FlexType')->with('Location')->with('CuttingType')->first();
 
         //fn($query) => $query->with('OffloadingHoursFrom')
 
         return inertia(
-            'InterlockLine/Show',
+            'ComponentLine/Show',
             [
-                'interlock_line' => $interlockLine,
+                'component' => 'Interlock',
+                'component_line' => $interlockLine,
                 'all_staff_members' => $all_staff_members,
                 'all_business_units' => $all_business_units,
                 'all_assembly_lines' => $all_assembly_lines,
@@ -209,9 +206,9 @@ class InterlockLineController extends Controller
      * Update the specified resource in storage.
      *
      * @param \Illuminate\Http\Request $request
-     * @param \App\Models\InterlockLine $interlockLine
+     * @param \App\Models\ComponentLine $interlockLine
      */
-    public function update(Request $request, InterlockLine $interlockLine)
+    public function update(Request $request, ComponentLine $interlockLine)
     {
 
         //'line_shift_id', 'job_card_no', 'production_model_type_id', 'shift_leader_id', 'operator_id', 'business_unit_id', 'assembly_line_id', 'prod_capacity', 'prod_plan', 'prod_actual', 'prod_return',
@@ -221,7 +218,7 @@ class InterlockLineController extends Controller
         $request->validate([
             'job_card_no' => ['required', 'string'],
             'line_shift_id' => ['required', 'integer', 'exists:line_shifts,id'],
-            'interlock_type_id' => ['required', 'integer', 'exists:interlocks,id'],
+            'component_id' => ['required', 'integer', 'exists:components,id'],
             'production_model_type_id' => ['required', 'integer', 'exists:production_models,id'],
             'shift_leader_id' => ['required', 'integer', 'exists:staff_members,id'],
             'operator_id' => ['required', 'integer', 'exists:staff_members,id'],

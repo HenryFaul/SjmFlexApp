@@ -2,11 +2,10 @@
 
 namespace App\Imports;
 
-use App\Models\Interlock;
-use App\Models\InterlockDefect;
-use App\Models\InterlockDefectType;
-use App\Models\InterlockLine;
-use App\Models\InterlockType;
+use App\Models\Component;
+use App\Models\ComponentLine;
+use App\Models\ComponentDefect;
+use App\Models\DefectType;
 use App\Models\LineShift;
 use App\Models\ProductionModel;
 use App\Models\Shift;
@@ -35,28 +34,28 @@ class ImportInterlockLines implements ToCollection
                 $line_shift = self::firstOrCreateLineShift($interlockDate,$shift);
                 $job_card_no = trim($row[21]);
                 $production_model = ProductionModel::where('model',trim($row[3]))->first();
-                $interlock_type= InterlockType::where('name',trim($row[5]))->first();
                 $shift_leader = StaffMember::search(trim($row[9]))->first();
                 $operator_name = str_replace(".", " ", trim($row[10]));
                 $business_unit_id = 1;
                 $assembly_line_id = 1;
                 $operator = StaffMember::search($operator_name)->first();
-                $interlock = Interlock::where('model_type_id',$production_model->id)->first();//136
+                $interlock = Component::where('model_type_id',$production_model->id)->first();//136
                 if($interlock != null) {
-                    $interlock_line = InterlockLine::create([
+                    $interlock_line = ComponentLine::create([
                         'job_card_no' =>  $job_card_no,
+                        'component_id' => $interlock->id,
                         'flex_type_id' => $production_model->flex_type_id,
                         'line_shift_id' =>$line_shift->id,
                         'interlock_type_id' => $interlock->id,
-                        'production_model_type_id' => $production_model->id,//136
                         'shift_leader_id' =>  $shift_leader->id,
                         'operator_id' =>  $operator->id ?? 1,
                         'business_unit_id' => $business_unit_id,
                         'assembly_line_id' => $assembly_line_id,
-                        'prod_capacity' => $interlock->interlock_value,
+                        'prod_capacity' => $interlock->component_value,
                         'prod_plan' => $prod_plan,
                         'prod_actual' => $prod_actual,
-                        'man_input' => $man_input
+                        'man_input' => $man_input,
+                        'component' => 'Interlock',
                     ]);
                     $interlock_line->calculateFields();
                     //Assume position is pivot table is going to stay the same. Interlock forming defect values import
@@ -65,21 +64,19 @@ class ImportInterlockLines implements ToCollection
                         $value_text = str_replace(',', '.', $value_text); // Change comma to a period
                         $value = floatval($value_text);
                         if($value != null && $value > 0) {
-                            $interlock_defect_type = InterlockDefectType::where('import_pos', $i)->first();
-                            $interlock_defect = InterlockDefect::create([
+                            $interlock_defect_type = DefectType::where('import_pos', $i)->first();
+                            $interlock_defect = ComponentDefect::create([
                                 'line_shift_id' => $line_shift->id,
-                                'interlock_line_id' => $interlock_line->id,
-                                'production_model_type_id' => $production_model->id,
-                                'interlock_type_id' => $interlock->id,
-                                'interlock_defect_type_id' => $interlock_defect_type->id,
-                                'interlock_defect_group_type_id' => $interlock_defect_type->interlock_defect_group_id,
+                                'component_line_id' => $interlock_line->id,
+                                'defect_type_id' => $interlock_defect_type->id,
                                 'defect_bases_type_id' => 2, //weight
                                 'salvage_value' => 0,
                                 'value' => $value,
                                 'comment' => '',
                                 'is_inc' => 0,
+                                'component' => 'Interlock',
                             ]);
-                            $interlock_defect->totalDefect();
+                            $interlock_defect->ComponentLine->recalculateComponentLineDefects("Interlock");
                         }
                     }
                 }

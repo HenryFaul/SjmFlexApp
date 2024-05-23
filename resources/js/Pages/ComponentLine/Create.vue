@@ -26,27 +26,26 @@ const props = defineProps({
     all_staff_members:Object,
     all_business_units:Object,
     all_assembly_lines:Object,
-    all_interlocks:Object
+    all_components:Object,
+    component:String,
 });
 
-//'job_card_no','production_model_type_id','shift_leader_id','operator_id','business_unit_id','assembly_line_id'
 let form = useForm({
     line_shift_id:null,
     job_card_no:null,
     production_model_type_id:1,
-    interlock_type_id:1,
+    component_id:-1,
     shift_leader_id:1,
     operator_id:1,
     business_unit_id:1,
     assembly_line_id:1,
-
 });
 
 const reset = () => {
         form.line_shift_id=null;
         form.job_card_no=null;
         form.production_model_type_id=1;
-        form.interlock_type_id=1;
+        form.component_id=1;
         form.shift_leader_id=1;
         form.operator_id=1;
         form.business_unit_id=1;
@@ -63,24 +62,24 @@ const filteredModelTypes = computed(() =>
         })
 );
 
-let interlockTypeQuery = ref('');
+let componentTypeQuery = ref('');
 
-const filteredInterlockTypes = computed(() =>
-    interlockTypeQuery.value === ''
-        ? props.all_interlocks.filter((interlock) => {
-            return interlock.model_type_id === form.production_model_type_id;
+const filteredComponentTypes = computed(() =>
+    componentTypeQuery.value === ''
+        ? props.all_components.filter((component) => {
+            return component.model_type_id === form.production_model_type_id;
         })
-        : props.all_interlocks.filter((interlock) => {
-            return interlock.production_model.model.toLowerCase().includes(modelTypeQuery.value.toLowerCase());
-        }).filter((interlock) => {
-            return interlock.model_type_id === form.production_model_type_id;
+        : props.all_components.filter((component) => {
+            return component.production_model.model.toLowerCase().includes(modelTypeQuery.value.toLowerCase());
+        }).filter((component) => {
+            return component.model_type_id === form.production_model_type_id;
         })
 );
 
 
+let found_component = computed(() => props.all_components.length === 0 || form.component_id === -1 ? null :  props.all_components.find(element => element.id === form.component_id));
 
-//const roles_permissions = computed(() => usePage().props.roles_permissions);
-//const can_manage_users = computed(() => usePage().props.roles_permissions.permissions.includes("manage_users"));
+
 
 const viewLineShiftModal = ref(false);
 
@@ -92,35 +91,32 @@ const viewLineShiftDetail = () => {
     viewLineShiftModal.value = true;
 };
 
+watch(filteredComponentTypes, (newVal) => {
+    if (newVal.length > 0) {
+        form.component_id = newVal[0].id;
+    }
+}, { immediate: true });
 
 
-const createInterlockLine = () => {
-
+const createComponentLine = () => {
     form.post(route('interlock_line.store'), {
         preserveScroll: true,
         onSuccess: () => {
-
             alert('Created');
             reset();
-
         },
-
         onError: (e) => {
             console.log(e);
         },
     });
 };
-
-let found_interlock = computed(() => props.all_interlocks.length === 0 || form.interlock_type_id === 1 ? null :  props.all_interlocks.find(element => element.id === form.interlock_type_id));
-
-
 </script>
 
 <template>
-    <AppLayout title="InterLock Line">
+    <AppLayout title="{{component}} Line">
         <template #header>
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-                New Interlock Line
+                New {{component}} Line
             </h2>
         </template>
 
@@ -134,7 +130,7 @@ let found_interlock = computed(() => props.all_interlocks.length === 0 || form.i
 
                         <div class="m-3 p-3">
                             <form>
-                                <div class="text-lg mb-4 text-indigo-400">Interlock Line</div>
+                                <div class="text-lg mb-4 text-indigo-400">{{component}} Line</div>
                                 <div class="space-y-12">
                                     <div class="grid grid-cols-1 gap-x-8 gap-y-10 border-b border-gray-900/10 pb-12 md:grid-cols-3">
                                         <div>
@@ -169,8 +165,8 @@ let found_interlock = computed(() => props.all_interlocks.length === 0 || form.i
 
                                     <div class="grid grid-cols-1 gap-x-8 gap-y-10 border-b border-gray-900/10 pb-12 md:grid-cols-3">
                                         <div>
-                                            <h2 class="text-base font-semibold leading-7 text-gray-900">Interlock Line Details</h2>
-                                            <p class="mt-1 text-sm leading-6 text-gray-600">Complete the details for the specif Interlock Line Item on the selected Shift.</p>
+                                            <h2 class="text-base font-semibold leading-7 text-gray-900">{{component}} Line Details</h2>
+                                            <p class="mt-1 text-sm leading-6 text-gray-600">Complete the details for the specif {{component}} Line Item on the selected Shift.</p>
                                         </div>
 
                                         <div class="grid max-w-2xl grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6 md:col-span-2">
@@ -225,20 +221,20 @@ let found_interlock = computed(() => props.all_interlocks.length === 0 || form.i
                                             </div>
 
                                             <div class="sm:col-span-3">
-                                                <label class="block text-sm font-medium leading-6 text-gray-900">Interlock</label>
+                                                <label class="block text-sm font-medium leading-6 text-gray-900">{{component}}</label>
 
-                                                <div v-if="filteredInterlockTypes.length !== 0" class="">
-                                                    <select v-model="form.interlock_type_id"
+                                                <div v-if="filteredComponentTypes.length !== 0" class="">
+                                                    <select v-model="form.component_id"
                                                             class="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-indigo-600 sm:text-sm sm:leading-6">
-                                                        <option v-for="n in filteredInterlockTypes" :key="n.id" :value="n.id">
+                                                        <option v-for="n in filteredComponentTypes" :key="n.id" :value="n.id">
                                                             {{n.production_model.model}} ({{n.production_model.flex_type.name}})
                                                         </option>
                                                     </select>
 
-                                                    <InputError class="mt-2" :message="form.errors.interlock_type_id"/>
+                                                    <InputError class="mt-2" :message="form.errors.component_id"/>
 
                                                 </div>
-                                                <div v-else class="text-red-600">No interlock found linked to the Model. Please Link interlock or select another model to continue.</div>
+                                                <div v-else class="text-red-600">No {{ component }} found linked to the Model. Please select another model to continue.</div>
 
                                             </div>
 
@@ -298,15 +294,22 @@ let found_interlock = computed(() => props.all_interlocks.length === 0 || form.i
 
                                             </div>
 
-                                            <div v-if="filteredInterlockTypes.length !== 0" class="sm:col-span-6">
-                                                <label class="block text-sm font-medium leading-6 text-gray-900">Linked Interlock Details </label>
+                                            <div v-if="component === 'Spring'" class="sm:col-span-3">
+                                                <label class="block text-sm font-medium leading-6 text-gray-900">Corr</label>
+                                                <input v-model="form.corr" type="number" name="corr" id="corr" required class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" />
+                                                <InputError class="mt-2" :message="form.errors.corr"/>
+                                            </div>
 
-                                                <div v-if="found_interlock != null">
-                                                    <div v-if="found_interlock.model_type_id === form.production_model_type_id" class="ml-2 mt-2 text-sm">
-                                                        <div> <span class="font-bold">Model: </span> <span> {{found_interlock.production_model.model}} ({{found_interlock.production_model.flex_type.name}})</span> </div>
-                                                        <div> <span class="font-bold">Value: </span> <span> {{found_interlock.interlock_value}}</span> </div>
-                                                        <div> <span class="font-bold">BOM: </span> <span> {{found_interlock.bom}}</span> </div>
-                                                        <div> <span class="font-bold">Syspro: </span> <span> {{found_interlock.syspro_code}}</span> </div>
+                                            <div v-if="filteredComponentTypes.length !== 0" class="sm:col-span-6">
+                                                <label class="block text-sm font-medium leading-6 text-gray-900">Linked
+                                                    {{ component }} Details </label>
+
+                                                <div v-if="found_component != null">
+                                                    <div v-if="found_component.model_type_id === form.production_model_type_id" class="ml-2 mt-2 text-sm">
+                                                        <div> <span class="font-bold">Model: </span> <span> {{found_component.production_model.model}} ({{found_component.production_model.flex_type.name}})</span> </div>
+                                                        <div> <span class="font-bold">Value: </span> <span> {{found_component.component_value}}</span> </div>
+                                                        <div> <span class="font-bold">BOM: </span> <span> {{found_component.bom}}</span> </div>
+                                                        <div> <span class="font-bold">Syspro: </span> <span> {{found_component.syspro_code}}</span> </div>
                                                     </div>
                                                 </div>
                                             </div>
@@ -319,7 +322,7 @@ let found_interlock = computed(() => props.all_interlocks.length === 0 || form.i
                                 </div>
 
                                 <div class="mt-6 flex items-center justify-end gap-x-6">
-                                    <secondary-button @click="createInterlockLine"  class="mt-3">Create</secondary-button>
+                                    <secondary-button @click="createComponentLine"  class="mt-3">Create</secondary-button>
                                 </div>
                             </form>
                         </div>
