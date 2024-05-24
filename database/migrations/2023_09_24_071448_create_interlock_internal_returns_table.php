@@ -25,10 +25,6 @@ return new class extends Migration
             $table->foreign('line_shift_id')
                 ->references('id')->on('line_shifts')->onDelete('cascade');
 
-            $table->bigInteger('interlock_line_id')->unsigned();
-            $table->foreign('interlock_line_id')
-                ->references('id')->on('interlock_lines')->onDelete('cascade');
-
             $table->bigInteger('defect_bases_type_id')->unsigned();
             $table->foreign('defect_bases_type_id')
                 ->references('id')->on('defect_bases')->onDelete('cascade');

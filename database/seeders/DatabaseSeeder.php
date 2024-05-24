@@ -271,6 +271,7 @@ class DatabaseSeeder extends Seeder
 
         DefectGroup::create([
             'value' => 'unallocated',
+            'component' => 'unallocated'
         ]);
 
         $InterlockFormingGroup = DefectGroup::create([
@@ -376,7 +377,8 @@ class DatabaseSeeder extends Seeder
 
         DefectType::create([
             'value' => 'unallocated',
-            'component' => 'Interlock'
+            'component' => 'unallocated',
+            'defect_group_id' => 1,
         ]);
 
         DefectType::create([
