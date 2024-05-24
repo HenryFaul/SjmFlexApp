@@ -24,7 +24,7 @@ class StaffMemberController extends Controller
         ]);
         //$filters = $request->input('searchName', ''); // Get the search term from the request
         $paginate = $request['show'] ?? 10;
-        $staff_members = StaffMember::filter($filters['searchName'])->paginate($paginate)->withQueryString();
+        $staff_members = StaffMember::paginate($paginate)->withQueryString();
 
         return inertia(
             'StaffMember/Index',

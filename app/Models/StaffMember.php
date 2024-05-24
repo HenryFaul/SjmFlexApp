@@ -26,4 +26,15 @@ class StaffMember extends Model
             }
         });
     }
+    public function scopeSearch($query, $searchTerm)
+    {
+        // Split the search term into separate words
+        $splitSearch = array_filter(explode(' ', $searchTerm)); // Split into words, remove empty
+
+        return $query->where(function ($query) use ($splitSearch) {
+            foreach ($splitSearch as $word) {
+                $query->where('last_name', 'like', '%' . Str::lower($word) . '%');
+            }
+        });
+    }
 }
