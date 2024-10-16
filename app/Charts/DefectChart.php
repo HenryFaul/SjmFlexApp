@@ -27,7 +27,7 @@ class DefectChart
         $data = ComponentLine::where('component',$component)->join('line_shifts', 'component_lines.line_shift_id', '=', 'line_shifts.id')
             ->whereBetween('line_shifts.shift_date', [$startDate, $endDate]) // Modify 'date_column' to your actual column  name
             ->where('flex_type_id',$flex_type_id)
-            ->select(DB::raw('line_shifts.shift_date as shift_date'), DB::raw('SUM(component_lines.total_defect_qty_conv_ex) as total_qty_defect_ex'), DB::raw('SUM(component_lines.prod_actual) as total_actual'))
+            ->select(DB::raw('line_shifts.shift_date as shift_date'), DB::raw('SUM(component_lines.total_defect_qty_conv_ex) +  SUM(component_lines.total_defect_qty_ex) as total_qty_defect_ex'), DB::raw('SUM(component_lines.prod_actual) as total_actual'))
             ->groupBy('line_shifts.shift_date')
             ->get();
 

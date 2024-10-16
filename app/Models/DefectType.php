@@ -12,7 +12,7 @@ class DefectType extends Model
     use SoftDeletes;
     use HasFactory;
 
-    public $fillable = ['value','comment','is_active','is_material_error','import_pos','component'];
+    public $fillable = ['value','comment','is_active','is_material_error','import_pos','is_inc','component'];
 
     public function DefectGroup(): BelongsTo
     {

@@ -91,142 +91,59 @@ const classesProductInfo = computed(() => {
                                                     Line Shifts
                                                 </DropdownLink>
 
-                                                <DropdownLink :href="route('interlock_line.create')">
-                                                    Business Units
+                                                <div class="border-t border-gray-100" />
+
+                                            </template>
+                                        </Dropdown>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="hidden sm:flex sm:items-center sm:ml-6">
+                                <!-- Data Dropdown -->
+                                <div class="ml-3 relative">
+                                    <div :class="classesProductInfo">
+                                        <Dropdown align="right" width="48">
+                                            <template #trigger>
+                                            <span  class="inline-flex rounded-md">
+                                            <button type="button" class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 bg-white hover:text-gray-700 focus:outline-none focus:bg-gray-50 active:bg-gray-50 transition">
+                                                Component Lines
+                                               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                                                  <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+                                                </svg>
+
+                                            </button>
+                                        </span>
+                                            </template>
+
+                                            <template #content>
+                                                <DropdownLink :href="'/component_line/' + 'Interlock'">
+                                                    Interlock Lines
                                                 </DropdownLink>
 
-                                                <DropdownLink :href="route('interlock_line.create')">
+                                                <DropdownLink :href="'/component_line/' + 'Braiding'">
+                                                    Braiding Lines
+                                                </DropdownLink>
+
+                                                <dropdown-link :href="'/component_line/' + 'Knitting'">
+                                                    Knitting Lines
+                                                </dropdown-link>
+
+                                                <dropdown-link :href="'/component_line/' + 'Tubing'">
+                                                    Tubing Lines
+                                                </dropdown-link>
+
+                                                <dropdown-link :href="'/component_line/' + 'Assembly'">
                                                     Assembly Lines
-                                                </DropdownLink>
+                                                </dropdown-link>
 
-                                                <div class="border-t border-gray-100" />
+                                                <dropdown-link :href="'/component_line/' + 'Grammage'">
+                                                    Grammage Lines
+                                                </dropdown-link>
 
-                                            </template>
-                                        </Dropdown>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="hidden sm:flex sm:items-center sm:ml-6">
-                                <!-- Data Dropdown -->
-                                <div class="ml-3 relative">
-                                    <div :class="classesProductInfo">
-                                        <Dropdown align="right" width="48">
-                                            <template #trigger>
-                                            <span  class="inline-flex rounded-md">
-                                            <button type="button" class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 bg-white hover:text-gray-700 focus:outline-none focus:bg-gray-50 active:bg-gray-50 transition">
-                                                Interlock
-                                               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
-                                                  <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
-                                                </svg>
-
-                                            </button>
-                                        </span>
-                                            </template>
-
-                                            <template #content>
-                                                <!-- Account Management -->
-                                                <div class="block px-4 py-2 text-xs text-gray-400">
-                                                    Manage Interlock
-                                                </div>
-
-                                                <DropdownLink :href="route('interlock_line.create')">
-                                                    Create Interlock Line
-                                                </DropdownLink>
-
-                                                <DropdownLink :href="route('interlock_line.index')">
-                                                    All Interlock Lines
-                                                </DropdownLink>
-
-                                                <DropdownLink :href="route('interlock_line_graph.month_to_date')">
-                                                    Interlock Month to Date
-                                                </DropdownLink>
-
-                                                <div class="border-t border-gray-100" />
-
-                                            </template>
-                                        </Dropdown>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="hidden sm:flex sm:items-center sm:ml-6">
-                                <!-- Data Dropdown -->
-                                <div class="ml-3 relative">
-                                    <div :class="classesProductInfo">
-                                        <Dropdown align="right" width="48">
-                                            <template #trigger>
-                                            <span  class="inline-flex rounded-md">
-                                            <button type="button" class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 bg-white hover:text-gray-700 focus:outline-none focus:bg-gray-50 active:bg-gray-50 transition">
-                                                Knitting
-                                               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
-                                                  <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
-                                                </svg>
-
-                                            </button>
-                                        </span>
-                                            </template>
-
-                                            <template #content>
-                                                <!-- Account Management -->
-                                                <div class="block px-4 py-2 text-xs text-gray-400">
-                                                    Manage Knitting
-                                                </div>
-
-                                                <DropdownLink :href="route('interlock_line.create')">
-                                                    Create Knitting Line
-                                                </DropdownLink>
-
-                                                <DropdownLink :href="route('interlock_line.index')">
-                                                    All Knitting Lines
-                                                </DropdownLink>
-
-                                                <DropdownLink :href="route('interlock_line_graph.month_to_date')">
-                                                    Knitting Month to Date
-                                                </DropdownLink>
-
-                                                <div class="border-t border-gray-100" />
-
-                                            </template>
-                                        </Dropdown>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="hidden sm:flex sm:items-center sm:ml-6">
-                                <!-- Data Dropdown -->
-                                <div class="ml-3 relative">
-                                    <div :class="classesProductInfo">
-                                        <Dropdown align="right" width="48">
-                                            <template #trigger>
-                                            <span  class="inline-flex rounded-md">
-                                            <button type="button" class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 bg-white hover:text-gray-700 focus:outline-none focus:bg-gray-50 active:bg-gray-50 transition">
-                                                Braiding
-                                               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
-                                                  <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
-                                                </svg>
-
-                                            </button>
-                                        </span>
-                                            </template>
-
-                                            <template #content>
-                                                <!-- Account Management -->
-                                                <div class="block px-4 py-2 text-xs text-gray-400">
-                                                    Manage Braiding
-                                                </div>
-
-                                                <DropdownLink :href="route('interlock_line.create')">
-                                                    Create Braiding Line
-                                                </DropdownLink>
-
-                                                <DropdownLink :href="route('interlock_line.index')">
-                                                    All Braiding Lines
-                                                </DropdownLink>
-
-                                                <DropdownLink :href="route('interlock_line_graph.month_to_date')">
-                                                    Braiding Month to Date
-                                                </DropdownLink>
+                                                <dropdown-link :href="'/component_line/' + 'Slitting'">
+                                                    Slitting Lines
+                                                </dropdown-link>
 
                                                 <div class="border-t border-gray-100" />
 
@@ -237,10 +154,11 @@ const classesProductInfo = computed(() => {
                             </div>
 
                             <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
-                                <NavLink :href="route('import.index')" :active="route().current('import.index')">
-                                    Data Imports
+                                <NavLink :href="'/component_line/create'" :active="route().current('component_line')">
+                                    Create +
                                 </NavLink>
                             </div>
+
                         </div>
 
 

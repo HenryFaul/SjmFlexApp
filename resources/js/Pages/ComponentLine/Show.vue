@@ -1,6 +1,6 @@
 <script setup>
 import AppLayout from '@/Layouts/AppLayout.vue';
-import {computed, ref, watch, inject} from 'vue';
+import {computed, ref, watch, inject, nextTick} from 'vue';
 import SecondaryButton from '@/Components/SecondaryButton.vue';
 import {router, useForm, usePage} from "@inertiajs/vue3";
 import InputError from '@/Components/InputError.vue';
@@ -26,7 +26,7 @@ const props = defineProps({
     all_business_units:Object,
     all_assembly_lines:Object,
     down_times:Object,
-    defects:Object
+    defects:Object,
 });
 
 let componentForm = useForm({
@@ -45,7 +45,7 @@ let componentForm = useForm({
 });
 
 const updateComponentLine = () => {
-    componentForm.put(route('interlock_line.update', props.component_line.id),
+    componentForm.put('/component_line/' + props.component + '/'+ props.component_line.id,
         {
             preserveScroll: true,
             onSuccess: () => {
@@ -71,13 +71,42 @@ const viewDownTimeDetail = () => {
 
 
 const viewDefectModal = ref(false);
-
+let currentDefect = ref(null);
+let isEditingDefect = ref(false);
 const closeDefect = () => {
     viewDefectModal.value = false;
 };
 
 const viewDefectDetail = () => {
+    isEditingDefect = false
     viewDefectModal.value = true;
+};
+
+const editDefectDetail = (defect) => {
+    isEditingDefect = true;
+    currentDefect.value = defect;
+    viewDefectModal.value = true;
+};
+
+const deleteDefectDetail = (defect) => {
+    if (!defect || !defect.id) {
+        console.error("Invalid defect object");
+        return;
+    }
+
+    // Confirm deletion
+    if (confirm(`Are you sure you want to delete defect ${defect.id}?`)) {
+        axios.post(route('defects.destroy', defect.id))  // Assuming this is your delete route
+            .then(response => {
+                console.log('Defect deleted successfully', response.data);
+                // Perform any UI updates here, like removing the defect from the list
+                window.location.reload();
+            })
+            .catch(error => {
+                console.error('There was an error deleting the defect:', error);
+                // Handle any errors, maybe show a user-friendly message
+            });
+    }
 };
 
 
@@ -439,8 +468,8 @@ const people = [
                 <div v-if="component_line.component"  class="bg-white overflow-hidden shadow-xl sm:rounded-lg">
 
                     <div>
-                        <DefectModal :show="viewDefectModal" :line_shift_id="component_line.line_shift_id"
-                                     :component_line_id="component_line.id" :component="component" @close="closeDefect"> </DefectModal>
+                        <DefectModal :show="viewDefectModal" :line_shift_id="component_line.line_shift_id" :defect="currentDefect"
+                                     :component_line_id="component_line.id" :component="component" @close="closeDefect" :isEditing="isEditingDefect"> </DefectModal>
                         <div class="m-3 p-3">
 
                             <div class="text-lg mb-4 text-indigo-400">{{component}} Defect</div>
@@ -486,9 +515,8 @@ const people = [
                                                     <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{defect.salvage_value}}</td>
                                                     <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{defect.comment}}</td>
                                                     <td class="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-0">
-                                                        <a href="#" class="text-indigo-600 hover:text-indigo-900"
-                                                        >Delete<span class="sr-only"></span></a
-                                                        >
+                                                        <a href="#" class="text-indigo-600 hover:text-indigo-900 m-2" @click="editDefectDetail(defect)">Edit<span class="sr-only"></span></a>
+                                                        <a href="#" class="text-indigo-600 hover:text-indigo-900 m-2" @click="deleteDefectDetail(defect)">Delete<span class="sr-only"></span></a>
                                                     </td>
                                                 </tr>
                                                 </tbody>

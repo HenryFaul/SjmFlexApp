@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Imports\ImportBraiding;
 use App\Imports\ImportInterlock;
 use App\Imports\ImportKnitting;
+use App\Imports\ImportKnittingLines;
 use App\Imports\ImportProductionModel;
 use App\Imports\ImportRing;
 use App\Imports\ImportRingTube;
@@ -115,6 +116,18 @@ class DataImportController extends Controller
                 $count_after = ComponentLine::where('component','Interlock')->count();
 
                 $message = "Interlock lines count before: ".$count_before." count after: ".$count_after;
+
+                break;
+            case "KnittingLines.xlsx":
+
+                $count_before = ComponentLine::where('component','Knitting')->count();
+
+                Excel::import(new ImportKnittingLines(),
+                    $request->file('file')->store('files'));
+
+                $count_after = ComponentLine::where('component','Knitting')->count();
+
+                $message = "Knitting lines count before: ".$count_before." count after: ".$count_after;
 
                 break;
 

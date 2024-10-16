@@ -8,7 +8,7 @@ use App\Models\DownTimeType;
 use App\Models\Shift;
 use Illuminate\Http\Request;
 
-class InterlockDownTimeController extends Controller
+class DownTimeController extends Controller
 {
 
     public function getProps(): array

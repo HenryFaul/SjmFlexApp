@@ -1,13 +1,11 @@
 <?php
 
 use App\Http\Controllers\DataImports\DataImportController;
-use App\Http\Controllers\InterlockDefectController;
-use App\Http\Controllers\InterlockDownTimeController;
-use App\Http\Controllers\InterlockLineController;
+use App\Http\Controllers\DefectController;
+use App\Http\Controllers\DownTimeController;
+use App\Http\Controllers\LineController;
 use App\Http\Controllers\LineShiftController;
-use App\Http\Controllers\ProductionModelController;
 use App\Http\Controllers\StaffMemberController;
-use App\Models\ProductionModel;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -37,59 +35,26 @@ Route::middleware([
     config('jetstream.auth_session'),
     'verified',
 ])->group(function () {
-    Route::get('/dashboard', function () {
-        return Inertia::render('Dashboard');
-    })->name('dashboard');
-
-
-    //Data import route
-
-    Route::get('/import', [DataImportController::class, 'index'])->middleware('auth')->name('import.index');
-    Route::post('/import', [DataImportController::class, 'import'])->middleware('auth')->name('import.process');
-
-
-    //Staff
-
-    Route::resource('staff_member', StaffMemberController::class)->middleware('auth')
+        Route::get('/dashboard', [LineController::class, 'monthToDate'])->name('dashboard');
+        Route::get('/import', [DataImportController::class, 'index'])->middleware('auth')->name('import.index');
+        Route::post('/import', [DataImportController::class, 'import'])->middleware('auth')->name('import.process');
+        Route::resource('staff_member', StaffMemberController::class)->middleware('auth')
         ->only(['index','show']);
-
-    //Transport Trans modal Props
-    Route::get('/props/line_shift_modal', [LineShiftController::class, 'getProps'])->middleware('auth')->name('props.line_shift_modal');
-
-    //Interlock Downtime Modal Props
-
-    Route::get('/props/interlock_down_time_modal', [InterlockDownTimeController::class, 'getProps'])->middleware('auth')->name('props.interlock_down_time_modal');
-
-    //Interlock Defect Props
-
-    Route::get('/props/interlock_defect_modal', [InterlockDefectController::class, 'getProps'])->middleware('auth')->name('props.interlock_defect_modal');
-
-
-
-    //LineShift
-
-    Route::resource('line_shift', LineShiftController::class)->middleware('auth')
+        Route::get('/props/line_shift_modal', [LineShiftController::class, 'getProps'])->middleware('auth')->name('props.line_shift_modal');
+        Route::get('/props/interlock_down_time_modal', [DownTimeController::class, 'getProps'])->middleware('auth')->name('props.interlock_down_time_modal');
+        Route::get('/props/interlock_defect_modal', [DefectController::class, 'getProps'])->middleware('auth')->name('props.interlock_defect_modal');
+        Route::resource('line_shift', LineShiftController::class)->middleware('auth')
         ->only(['index','show','store']);
-
-    //InterlockLine
-
-    Route::resource('interlock_line', InterlockLineController::class)->middleware('auth')
-        ->only(['index','store','show','create','update']);
-
-    Route::get('/interlock_line_graph/month_to_date', [InterlockLineController::class, 'monthToDate'])->middleware('auth')->name('interlock_line_graph.month_to_date');
-
-
-    //Interlock DownTime
-
-    Route::resource('interlock_down_time', InterlockDownTimeController::class)->middleware('auth')
-        ->only(['index','store']);
-
-    //Interlock Defect
-
-    Route::resource('interlock_defect', InterlockDefectController::class)->middleware('auth')
-        ->only(['index','store']);
-
-
+        Route::get('/component_line/create', [LineController::class, 'create']);
+        Route::get('/component_line/{component}', [LineController::class, 'index'])->name('component_line.index');
+        Route::post('/component_line/{component}', [LineController::class, 'store']);
+        Route::get('/component_line/{component}/{id}', [LineController::class, 'show']);
+        Route::put('/component_line/{component}/{id}', [LineController::class, 'update']);
+        Route::post('/component_line/add_defect/{component}', [DefectController::class, 'store']);
+        Route::post('/component_line/delete_defect/{defect_id}', [DefectController::class, 'destroy'])->name('defects.destroy');
+        Route::get('/component_line/month_to_date', [LineController::class, 'monthToDate'])->middleware('auth')->name('interlock_line_graph.month_to_date');
+        Route::resource('interlock_down_time', DownTimeController::class)->middleware('auth')
+            ->only(['index','store']);
 });
 
 

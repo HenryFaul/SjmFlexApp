@@ -2,7 +2,7 @@
 import InputError from '@/Components/InputError.vue';
 import TextInput from '@/Components/TextInput.vue';
 import AreaInput from '@/Components/AreaInput.vue';
-import {computed, inject, onBeforeMount, onMounted, onUnmounted, ref} from "vue";
+import {computed, inject, onBeforeMount, onMounted, onUnmounted, ref, watch} from "vue";
 import {useForm, usePage} from "@inertiajs/vue3";
 import SecondaryButton from '@/Components/SecondaryButton.vue';
 import DialogModal from "@/Components/DialogModal.vue";
@@ -23,9 +23,23 @@ const props = defineProps({
     component_line_id:Number,
     component:String,
     production_model_type_id:Number,
+    isEditing: Boolean,
+    defect: Object
 });
 
-
+const form = useForm({
+    defect_id: null,
+    line_shift_id:props.line_shift_id,
+    component_line_id:props.component_line_id,
+    component:props.component,
+    defect_group_type_id:1,
+    defect_type_id:1,
+    defect_bases_type_id:1,
+    value:0,
+    salvage_value:0,
+    comment:null,
+    is_inc:1
+});
 
 const close = () => {
     emit('close');
@@ -40,44 +54,78 @@ onUnmounted(async () => {
 
 })
 
-onMounted(async () => {
+onMounted(() => {
 
-
-})
-
-let defectProps = ref(null);
-
-const getComponentProps = () => {
-    axios.get(route('props.interlock_defect_modal'),).then((res) => {
-        defectProps.value = res.data;
-        //form.shift_type_id = res.data["all_shifts"][0];
-    });
-
-};
-
-//public $fillable = ['line_shift_id','interlock_line_id','production_model_type_id','interlock_defect_type_id',
-//'interlock_defect_group_type_id','defect_bases_type_id','value','salvage_value'];
-
-const form = useForm({
-    line_shift_id:props.line_shift_id,
-    component_line_id:props.component_line_id,
-    component:props.component,
-    defect_group_type_id:1,
-    defect_type_id:1,
-    defect_bases_type_id:1,
-    value:0,
-    salvage_value:0,
-    comment:null,
-    is_inc:1
 });
 
+watch(() => props.defect, (newDefect) => {
+    if (newDefect) {
+        console.log("Defect found:");
+        console.log(props.defect);
+        if (props.defect) {
+            //console.log(props.defect.defect_type.defect_group.id);
+            form.defect_id = defect.id
+            form.defect_group_type_id = props.defect.defect_type.defect_group.id;
+            filterTypes();
+            form.defect_type_id = props.defect.defect_type.id;
+            form.line_shift_id = props.line_shift_id
+            form.component_line_id = props.component_line_id
+            form.component = props.component
+            form.defect_bases_type_id = props.defect.defect_bases_type_id
+            form.value = props.defect.value
+            form.salvage_value = props.defect.salvage_value
+            form.comment = props.defect.comment
+            form.is_inc = props.defect.is_inc
+        }
+    }
+});
+
+const defectProps = ref({
+    all_interlock_defect_groups: [],
+    all_interlock_defect_types: [],
+    all_defect_bases: [],
+    filtered_groups: [],
+    filtered_types: [],
+});
+
+const getComponentProps = () => {
+    axios.get(route('props.interlock_defect_modal')).then((res) => {
+        defectProps.value.all_interlock_defect_groups = res.data['all_interlock_defect_groups'];
+        defectProps.value.all_interlock_defect_types = res.data['all_interlock_defect_types'];
+        defectProps.value.all_defect_bases = res.data['all_defect_bases'];
+        filterGroups();
+    });
+};
+
+const filterGroups = () => {
+    defectProps.value.filtered_groups = defectProps.value.all_interlock_defect_groups.filter(
+        group => group.component === form.component
+    );
+};
+
+const filterTypes = () => {
+    defectProps.value.filtered_types = defectProps.value.all_interlock_defect_types.filter(
+        type => type.component === form.component && type.defect_group_id === form.defect_group_type_id
+    );
+};
+
+watch(() => form.component, () => {
+    filterGroups();
+    form.defect_group_type_id = null;
+    form.defect_type_id = null;
+});
+
+// Watch for changes in selected group to update defect types
+watch(() => form.defect_group_type_id, () => {
+    filterTypes();
+});
 
 const createDefect = () => {
 
-    form.post(route('interlock_defect.store'), {
+    form.post('/component_line/add_defect/' + props.component, {
         preserveScroll: true,
         onSuccess: () => {
-            alert('Created');
+            //alert('Created');
              //swal(usePage().props.jetstream.flash?.banner || '');
             close();
         },
@@ -112,18 +160,15 @@ let borderClass = computed(() => !emptyErrors ? 'ml-4 mt-4 p-4 rounded-md border
 
                             <div :class="borderClass">
 
-                                <div class="text-lg mb-2 text-indigo-400">New Defect</div>
-
-
-
+                                <div v-if="!isEditing" class="text-lg mb-2 text-indigo-400">New Defect</div>
+                                <div v-if="isEditing" class="text-lg mb-2 text-indigo-400">Update Defect</div>
                                 <div class="mt-3">
 
                                     <label class="block text-sm font-medium leading-6 text-gray-900">Defect Group</label>
-
                                     <select v-model="form.defect_group_type_id"
                                             class="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-indigo-600 sm:text-sm sm:leading-6">
-                                        <option v-for="n in defectProps['all_interlock_defect_groups']" :key="n.id" :value="n.id">
-                                            {{n.value}}
+                                        <option v-for="group in defectProps.filtered_groups" :key="group.id" :value="group.id">
+                                            {{group.value}}
                                         </option>
                                     </select>
 
@@ -137,8 +182,8 @@ let borderClass = computed(() => !emptyErrors ? 'ml-4 mt-4 p-4 rounded-md border
 
                                     <select v-model="form.defect_type_id"
                                             class="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-indigo-600 sm:text-sm sm:leading-6">
-                                        <option v-for="n in defectProps['all_interlock_defect_types']" :key="n.id" :value="n.id">
-                                            {{n.value}}
+                                        <option v-for="type in defectProps.filtered_types" :key="type.id" :value="type.id">
+                                            {{type.value}}
                                         </option>
                                     </select>
 
@@ -152,7 +197,7 @@ let borderClass = computed(() => !emptyErrors ? 'ml-4 mt-4 p-4 rounded-md border
 
                                     <select v-model="form.defect_bases_type_id"
                                             class="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-indigo-600 sm:text-sm sm:leading-6">
-                                        <option v-for="n in defectProps['all_defect_bases']" :key="n.id" :value="n.id">
+                                        <option v-for="n in defectProps.all_defect_bases" :key="n.id" :value="n.id">
                                             {{n.value}}
                                         </option>
                                     </select>
@@ -208,7 +253,6 @@ let borderClass = computed(() => !emptyErrors ? 'ml-4 mt-4 p-4 rounded-md border
                                     />
                                     <InputError class="mt-2" :message="form.errors.comment"/>
                                 </div>
-
                             </div>
 
                         </form>
@@ -224,7 +268,8 @@ let borderClass = computed(() => !emptyErrors ? 'ml-4 mt-4 p-4 rounded-md border
 
                 <div>
                     <SecondaryButton @click="createDefect" class="bg-red-400">
-                        Create
+                        <div v-if="!defect">Create</div>
+                        <div v-if="defect">Update</div>
                     </SecondaryButton>
                 </div>
 

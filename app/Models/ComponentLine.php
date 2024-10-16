@@ -15,9 +15,15 @@ class ComponentLine extends Model
     use SoftDeletes;
     use HasFactory;
 
-    public $fillable = ['line_shift_id', 'component','component_id', 'flex_type_id','job_card_no','shift_leader_id', 'operator_id', 'business_unit_id', 'assembly_line_id', 'prod_capacity', 'prod_plan', 'prod_actual',
-        'prod_qty_loss', 'daily_plan_vs_actual', 'work_time', 'work_down_time', 'man_input', 'total_defect_qty_inc','total_defect_kg_inc','total_defect_qty_conv_inc','total_defect_qty_conv_ex',
-        'total_defect_qty_ex','total_defect_kg_ex', 'total_defect_percent_inc', 'total_defect_percent_ex'];
+    public $fillable = ['line_shift_id', 'component','component_id',
+        'flex_type_id','job_card_no','shift_leader_id',
+        'operator_id', 'business_unit_id', 'assembly_line_id',
+        'prod_capacity', 'prod_plan', 'prod_actual',
+        'prod_qty_loss', 'daily_plan_vs_actual', 'work_time',
+        'work_down_time', 'man_input', 'total_defect_qty_inc',
+        'total_defect_kg_inc','total_defect_qty_conv_inc','total_defect_qty_conv_ex',
+        'total_defect_qty_ex','total_defect_kg_ex', 'total_defect_percent_inc',
+        'total_defect_percent_ex'];
 
     public function scopeMonth(Builder $query, array $filters): Builder
     {
@@ -52,7 +58,6 @@ class ComponentLine extends Model
     {
         $component_line = $this;
         $found_component = $component_line->Component;
-        $production_model = ProductionModel::where('id', $found_component->model_type_id)->first();
         $component_line->prod_capacity = $found_component->component_value;
         $component_line->prod_qty_loss = $component_line->prod_plan - $component_line->prod_actual;
         $component_line->daily_plan_vs_actual = round(($component_line->prod_actual/$component_line->prod_plan) * 100,2);
@@ -79,7 +84,7 @@ class ComponentLine extends Model
         $component_line->save();
     }
 
-    public function recalculateComponentLineDefects($component)
+    public function recalculateComponentLineDefects()
     {
 
         $componentLine = $this;
@@ -119,7 +124,7 @@ class ComponentLine extends Model
         }
 
         //=IFERROR([@[Defect Qty Total Excl2]]+[@Material2];"")
-        $componentLine->total_defect_qty_inc=$ex_pieces + $ex_pieces_conv; // + Whatever Material2 is as its always 0;
+        $componentLine->total_defect_qty_inc=$inc_pieces + $inc_pieces_conv + $ex_pieces + $ex_pieces_conv;
 
         $componentLine->total_defect_kg_inc=$inc_weight;
         $componentLine->total_defect_qty_ex=$ex_pieces;
@@ -130,7 +135,7 @@ class ComponentLine extends Model
         //calculate defect %
         if ($componentLine->prod_actual>0){
             //=IFERROR([@[Defect Qty Total Incl]]/[@[Prod Actual]];"")
-            $componentLine->total_defect_percent_inc = $componentLine->total_defect_qty_inc/$componentLine->prod_actual;
+            $componentLine->total_defect_percent_inc = ($componentLine->total_defect_qty_inc)/$componentLine->prod_actual;
             //=IFERROR([@[Defect Qty Total Excl2]]/([@[Prod Actual]]+[@[Defect Qty Total Excl2]]);"")
             $total_qty_ex = $ex_pieces+$ex_pieces_conv;
             $componentLine->total_defect_percent_ex = $total_qty_ex/($componentLine->prod_actual + $total_qty_ex);

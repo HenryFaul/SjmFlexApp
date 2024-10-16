@@ -2,14 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\DefectBasis;
 use App\Models\ComponentDefect;
+use App\Models\ComponentLine;
+use App\Models\DefectBasis;
 use App\Models\DefectGroup;
 use App\Models\DefectType;
-use App\Models\DownTimeType;
 use Illuminate\Http\Request;
 
-class InterlockDefectController extends Controller
+class DefectController extends Controller
 {
 
 
@@ -53,7 +53,7 @@ class InterlockDefectController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\RedirectResponse
      */
-    public function store(Request $request)
+    public function store(Request $request,$component)
     {
 
 
@@ -61,6 +61,7 @@ class InterlockDefectController extends Controller
        // 'interlock_defect_group_type_id','defect_bases_type_id','value','salvage_value','comment'
 
         $request->validate([
+            'defect_id' => ['nullable','exists:component_defects,id'],
             'line_shift_id' => ['required', 'integer','exists:line_shifts,id'],
             'component_line_id' => ['required', 'integer', 'exists:component_lines,id'],
             'defect_type_id' => ['required', 'integer', 'exists:defect_types,id'],
@@ -71,28 +72,47 @@ class InterlockDefectController extends Controller
             'is_inc' => ['required','boolean'],
             'component' => ['required','string']
         ]);
-
-        $interlock_defect = ComponentDefect::create([
-            'line_shift_id' => $request->line_shift_id,
-            'component_line_id' => $request->component_line_id,
-            'defect_type_id' => $request->defect_type_id,
-            'defect_bases_type_id' => $request->defect_bases_type_id,
-            'salvage_value' => $request->salvage_value,
-            'value' => $request->value,
-            'comment' => $request->comment,
-            'is_inc' => $request->is_inc,
-            'component' => $request->component,
-        ]);
-
-        if ($interlock_defect->exists()) {
-            $interlock_defect->ComponentLine->recalculateComponentLineDefects($request->component);
-            $request->session()->flash('flash.bannerStyle', 'success');
-            $request->session()->flash('flash.banner', 'Defect Created');
+        if ($request->defect_id) {
+            $interlock_defect = ComponentDefect::find($request->defect_id);
+            if ($interlock_defect) {
+                $interlock_defect->update([
+                    'line_shift_id' => $request->line_shift_id,
+                    'component_line_id' => $request->component_line_id,
+                    'defect_type_id' => $request->defect_type_id,
+                    'defect_bases_type_id' => $request->defect_bases_type_id,
+                    'salvage_value' => $request->salvage_value,
+                    'value' => $request->value,
+                    'comment' => $request->comment,
+                    'is_inc' => $request->is_inc,
+                    'component' => $component,
+                ]);
+            } else {
+                $request->session()->flash('flash.bannerStyle', 'danger');
+                $request->session()->flash('flash.banner', 'Defect NOT Updated');
+            }
         } else {
-            $request->session()->flash('flash.bannerStyle', 'danger');
-            $request->session()->flash('flash.banner', 'Defect NOT Created');
+            // Create a new defect if defect_id is not present
+            $interlock_defect = ComponentDefect::create([
+                'line_shift_id' => $request->line_shift_id,
+                'component_line_id' => $request->component_line_id,
+                'defect_type_id' => $request->defect_type_id,
+                'defect_bases_type_id' => $request->defect_bases_type_id,
+                'salvage_value' => $request->salvage_value,
+                'value' => $request->value,
+                'comment' => $request->comment,
+                'is_inc' => $request->is_inc,
+                'component' => $component,
+            ]);
+            if ($interlock_defect->exists()) {
+                $componentLine = ComponentLine::find($interlock_defect->component_line_id);
+                $componentLine->recalculateComponentLineDefects();
+                $request->session()->flash('flash.bannerStyle', 'success');
+                $request->session()->flash('flash.banner', 'Defect Created');
+            } else {
+                $request->session()->flash('flash.bannerStyle', 'danger');
+                $request->session()->flash('flash.banner', 'Defect NOT Created');
+            }
         }
-
         return redirect()->back();
     }
 
@@ -136,8 +156,17 @@ class InterlockDefectController extends Controller
      * @param  \App\Models\ComponentDefect  $interlockDefect
      * @return \Illuminate\Http\Response
      */
-    public function destroy(ComponentDefect $interlockDefect)
+    public function destroy(Request $request,$defect)
     {
-        //
+        $defect_id = $request->defect_id;
+        $defect = ComponentDefect::find($defect_id);
+        if ($defect->exists()) {
+            $defect->delete();
+            $request->session()->flash('flash.bannerStyle', 'success');
+            $request->session()->flash('flash.banner', 'Defect Deleted');
+        } else {
+            $request->session()->flash('flash.bannerStyle', 'danger');
+            $request->session()->flash('flash.banner', 'Defect NOT Deleted');
+        }
     }
 }

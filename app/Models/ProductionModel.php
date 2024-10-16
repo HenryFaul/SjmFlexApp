@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class ProductionModel extends Model
@@ -19,4 +20,8 @@ class ProductionModel extends Model
         return $this->belongsTo(FlexType::class,'flex_type_id');
     }
 
+    public function Components(): HasMany
+    {
+        return $this->hasMany(Component::class, 'model_type_id');
+    }
 }

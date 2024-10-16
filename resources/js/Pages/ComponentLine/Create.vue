@@ -27,9 +27,9 @@ const props = defineProps({
     all_business_units:Object,
     all_assembly_lines:Object,
     all_components:Object,
-    component:String,
 });
-
+const selectedFlexType = ref(2);
+const selectedComponent = ref(null);
 let form = useForm({
     line_shift_id:null,
     job_card_no:null,
@@ -39,6 +39,10 @@ let form = useForm({
     operator_id:1,
     business_unit_id:1,
     assembly_line_id:1,
+    component:null,
+    prod_plan:0,
+    prod_actual:0,
+    man_input: 0.0
 });
 
 const reset = () => {
@@ -50,26 +54,40 @@ const reset = () => {
         form.operator_id=1;
         form.business_unit_id=1;
         form.assembly_line_id=1;
+        form.component=null;
 };
 
 let modelTypeQuery = ref('');
 
-const filteredModelTypes = computed(() =>
-    modelTypeQuery.value === ''
-        ? props.all_production_models
-        : props.all_production_models.filter((production_model) => {
-            return production_model.model.toLowerCase().includes(modelTypeQuery.value.toLowerCase())
+const filteredModelTypes = computed(() => {
+    return modelTypeQuery.value === ''
+        ? props.all_production_models.filter((production_model) => {
+            return (
+                production_model.flex_type_id === selectedFlexType.value &&
+                production_model.components.some(component => component.component === selectedComponent.value)
+            );
         })
-);
+        : props.all_production_models.filter((production_model) => {
+            return (
+                production_model.model.toLowerCase().includes(modelTypeQuery.value.toLowerCase()) &&
+                production_model.flex_type_id === selectedFlexType.value &&
+                production_model.components.some(component => component.component === selectedComponent.value)
+            );
+        });
+});
 
 let componentTypeQuery = ref('');
 
 const filteredComponentTypes = computed(() =>
     componentTypeQuery.value === ''
         ? props.all_components.filter((component) => {
-            return component.model_type_id === form.production_model_type_id;
+            return component.component === form.component
+        }).filter((component) => {
+            return  component.model_type_id === form.production_model_type_id;
         })
         : props.all_components.filter((component) => {
+            return component.component === form.component
+        }).filter((component) => {
             return component.production_model.model.toLowerCase().includes(modelTypeQuery.value.toLowerCase());
         }).filter((component) => {
             return component.model_type_id === form.production_model_type_id;
@@ -97,9 +115,15 @@ watch(filteredComponentTypes, (newVal) => {
     }
 }, { immediate: true });
 
+watch(() => form.component, (newVal) => {
+    selectedComponent.value = newVal;
+    form.line_shift_id=null;
+    form.production_model_type_id=1;
+    form.component_id=1;
+}, { immediate: true });
 
 const createComponentLine = () => {
-    form.post(route('interlock_line.store'), {
+    form.post('/component_line/'+form.component, {
         preserveScroll: true,
         onSuccess: () => {
             alert('Created');
@@ -113,10 +137,10 @@ const createComponentLine = () => {
 </script>
 
 <template>
-    <AppLayout title="{{component}} Line">
+    <AppLayout title="Create Component Line">
         <template #header>
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-                New {{component}} Line
+                New {{form.component}} Line
             </h2>
         </template>
 
@@ -130,9 +154,56 @@ const createComponentLine = () => {
 
                         <div class="m-3 p-3">
                             <form>
-                                <div class="text-lg mb-4 text-indigo-400">{{component}} Line</div>
+                                <div class="text-lg mb-4 text-indigo-400">{{form.component}} Line</div>
                                 <div class="space-y-12">
                                     <div class="grid grid-cols-1 gap-x-8 gap-y-10 border-b border-gray-900/10 pb-12 md:grid-cols-3">
+                                        <div>
+                                            <h2 class="text-base font-semibold leading-7 text-gray-900">Component</h2>
+                                            <p class="mt-1 text-sm leading-6 text-gray-600">Select relevant component/ line/ type /mode.</p>
+                                            <p class="mt-2 text-sm leading-6 text-gray-600">The Details below are linked to the specific component.</p>
+                                        </div>
+
+                                        <div class="grid max-w-2xl grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6 md:col-span-2">
+
+                                            <div class="sm:col-span-3">
+                                                <label class="block text-sm font-medium leading-6 text-gray-900">Selected Component</label>
+                                                <div class="mt-2">
+
+                                                    <select v-model="form.component"
+                                                            class="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-indigo-600 sm:text-sm sm:leading-6">
+                                                        <option :key="'Interlock'" :value="'Interlock'">
+                                                            Interlock
+                                                        </option>
+                                                        <option :key="'Braiding'" :value="'Braiding'">
+                                                            Braiding
+                                                        </option>
+                                                        <option :key="'Knitting'" :value="'Knitting'">
+                                                            Knitting
+                                                        </option>
+                                                        <option :key="'Tubing'" :value="'Tubing'">
+                                                            Tubing
+                                                        </option>
+                                                        <option :key="'Assembly'" :value="'Assembly'">
+                                                            Assembly
+                                                        </option>
+                                                        <option :key="'Grammage'" :value="'Grammage'">
+                                                            Grammage
+                                                        </option>
+                                                        <option :key="'Slitting'" :value="'Slitting'">
+                                                            Slitting
+                                                        </option>
+                                                    </select>
+
+                                                </div>
+                                                <InputError class="mt-2" :message="form.errors.component"/>
+                                            </div>
+
+                                        </div>
+
+
+
+                                    </div>
+                                    <div v-if="form.component" class="grid grid-cols-1 gap-x-8 gap-y-10 border-b border-gray-900/10 pb-12 md:grid-cols-3">
                                         <div>
                                             <h2 class="text-base font-semibold leading-7 text-gray-900">Line Shift</h2>
                                             <p class="mt-1 text-sm leading-6 text-gray-600">Create or select relevant Line Shift.</p>
@@ -163,18 +234,27 @@ const createComponentLine = () => {
 
                                     </div>
 
-                                    <div class="grid grid-cols-1 gap-x-8 gap-y-10 border-b border-gray-900/10 pb-12 md:grid-cols-3">
+                                    <div v-if="form.component" class="grid grid-cols-1 gap-x-8 gap-y-10 border-b border-gray-900/10 pb-12 md:grid-cols-3">
                                         <div>
-                                            <h2 class="text-base font-semibold leading-7 text-gray-900">{{component}} Line Details</h2>
-                                            <p class="mt-1 text-sm leading-6 text-gray-600">Complete the details for the specif {{component}} Line Item on the selected Shift.</p>
+                                            <h2 class="text-base font-semibold leading-7 text-gray-900">{{form.component}} Line Details</h2>
+                                            <p class="mt-1 text-sm leading-6 text-gray-600">Complete the details for the specif {{form.component}} Line Item on the selected Shift.</p>
                                         </div>
 
                                         <div class="grid max-w-2xl grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6 md:col-span-2">
 
                                             <div class="sm:col-span-3">
                                                 <label class="block text-sm font-medium leading-6 text-gray-900">Job Card No</label>
-                                                <input v-model="form.job_card_no" type="text" name="job_card_no" id="job_card_no" required class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" />
+                                                <input v-model="form.job_card_no" type="text" name="job_card_no" id="job_card_no" class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" />
                                                 <InputError class="mt-2" :message="form.errors.job_card_no"/>
+                                            </div>
+
+                                            <div class="sm:col-span-3">
+                                                <label class="block text-sm font-medium leading-6 text-gray-900">Flex Type</label>
+                                                <select v-model="selectedFlexType" class="input-filter-l block w-64 rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                                                    <option :value=2>Passenger</option>
+                                                    <option :value=3>Small Truck</option>
+                                                    <option :value=4>Large Truck</option>
+                                                </select>
                                             </div>
 
                                             <div class="sm:col-span-3">
@@ -221,7 +301,7 @@ const createComponentLine = () => {
                                             </div>
 
                                             <div class="sm:col-span-3">
-                                                <label class="block text-sm font-medium leading-6 text-gray-900">{{component}}</label>
+                                                <label class="block text-sm font-medium leading-6 text-gray-900">{{form.component}}</label>
 
                                                 <div v-if="filteredComponentTypes.length !== 0" class="">
                                                     <select v-model="form.component_id"
@@ -234,7 +314,7 @@ const createComponentLine = () => {
                                                     <InputError class="mt-2" :message="form.errors.component_id"/>
 
                                                 </div>
-                                                <div v-else class="text-red-600">No {{ component }} found linked to the Model. Please select another model to continue.</div>
+                                                <div v-else class="text-red-600">No {{ form.component }} found linked to the Model. Please select another model to continue.</div>
 
                                             </div>
 
@@ -294,15 +374,52 @@ const createComponentLine = () => {
 
                                             </div>
 
-                                            <div v-if="component === 'Spring'" class="sm:col-span-3">
+                                            <div v-if="form.component === 'Spring'" class="sm:col-span-3">
                                                 <label class="block text-sm font-medium leading-6 text-gray-900">Corr</label>
                                                 <input v-model="form.corr" type="number" name="corr" id="corr" required class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" />
                                                 <InputError class="mt-2" :message="form.errors.corr"/>
                                             </div>
 
+                                            <div class="sm:col-span-2">
+                                                <label class="block text-sm font-medium leading-6 text-gray-900">Product Plan</label>
+                                                <div class="mt-2">
+
+                                                    <div class="">
+                                                        <input v-model="form.prod_plan" type="number"
+                                                               class="block w-32 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"/>
+                                                        <InputError class="mt-2" :message="form.errors.prod_plan"/>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="sm:col-span-2">
+                                                <label class="block text-sm font-medium leading-6 text-gray-900">Product Actual</label>
+                                                <div class="mt-2">
+
+                                                    <div class="">
+                                                        <input v-model="form.prod_actual" type="number"
+                                                               class="block w-32 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"/>
+                                                        <InputError class="mt-2" :message="form.errors.prod_actual"/>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="sm:col-span-2">
+                                                <label class="block text-sm font-medium leading-6 text-gray-900">Man Input</label>
+                                                <div class="mt-2">
+
+                                                    <div class="">
+                                                        <input v-model="form.man_input" type="number"
+                                                               class="block w-32 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"/>
+
+                                                        <InputError class="mt-2" :message="form.errors.man_input"/>
+                                                    </div>
+                                                </div>
+                                            </div>
+
                                             <div v-if="filteredComponentTypes.length !== 0" class="sm:col-span-6">
                                                 <label class="block text-sm font-medium leading-6 text-gray-900">Linked
-                                                    {{ component }} Details </label>
+                                                    {{ form.component }} Details </label>
 
                                                 <div v-if="found_component != null">
                                                     <div v-if="found_component.model_type_id === form.production_model_type_id" class="ml-2 mt-2 text-sm">
@@ -310,6 +427,7 @@ const createComponentLine = () => {
                                                         <div> <span class="font-bold">Value: </span> <span> {{found_component.component_value}}</span> </div>
                                                         <div> <span class="font-bold">BOM: </span> <span> {{found_component.bom}}</span> </div>
                                                         <div> <span class="font-bold">Syspro: </span> <span> {{found_component.syspro_code}}</span> </div>
+                                                        <div> <span class="font-bold">Component Type: </span> <span> {{found_component.component_type}}</span> </div>
                                                     </div>
                                                 </div>
                                             </div>

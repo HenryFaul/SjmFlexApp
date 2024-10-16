@@ -262,13 +262,13 @@ class DatabaseSeeder extends Seeder
         DefectBasis::create([
             'value' => 'Pieces',
         ]);
+        $this->interlockGroupSeed();
+        $this->knittingGroupSeed();
+        $this->braidingGroupSeed();
+    }
 
-        //Defect Group
-/*        •	Interlock Forming
-•	Spot Welding
-•	Induction Heating
-•	Interlock Clamping*/
-
+    function interlockGroupSeed(): void
+    {
         DefectGroup::create([
             'value' => 'unallocated',
             'component' => 'unallocated'
@@ -279,33 +279,20 @@ class DatabaseSeeder extends Seeder
             'component' => 'Interlock'
         ]);
 
-        DefectGroup::create([
-            'value' => 'Spot Welding',
+        $InterlockSpotWeldingGroup = DefectGroup::create([
+            'value' => 'Spot Welding Interlock',
             'component' => 'Interlock'
         ]);
 
-        DefectGroup::create([
+        $InductionHeatingGroup = DefectGroup::create([
             'value' => 'Induction Heating',
             'component' => 'Interlock'
         ]);
 
-        DefectGroup::create([
+        $ClampingGroup = DefectGroup::create([
             'value' => 'Interlock Clamping',
             'component' => 'Interlock'
         ]);
-
-        //InternalReturnType
-
-/*        •	Low Interlock
-•	Loose Interlock
-•	Interlock Spot Weld
-•	Interlock Decoupling
-•	Interlock Bubble
-•	Ring under Sleeve
-•	Twister Interlock
-•	Dents
-•	Cracks*/
-
 
         InternalReturnType::create([
             'value' => 'unallocated',
@@ -347,205 +334,209 @@ class DatabaseSeeder extends Seeder
             'value' => 'Cracks',
         ]);
 
-
-        //InterlockDefectType
-        /*        Coil Width Too Big
-        Damaged Coil
-        Coil Change / Change Over
-        Roll Off
-        Roll Up
-        Friction Hard/Soft
-        Closed Corrugation / tails
-        Vuvuzela/pitch to small
-        Cutting Length Long/Short
-        Bad/Skew Cutting
-        Spot Weld Holes
-        Spot Weld high/low Cracks
-        Spot Weld Damage
-        Damaged
-        Burn Away
-        High/Low Ring Position
-        Ring cracks/damage rings
-        Double Ring / gaps / skew /twisted
-        OD too Small/Big
-        Tails/ loose wires/ twisted
-        Length Short/long
-        Closed Corrugation2
-        Friction Hard/ soft
-        cracks/ holes/dents/edge damage
-        Damage/ bad cutting/clamping damage*/
-
         DefectType::create([
             'value' => 'unallocated',
             'component' => 'unallocated',
             'defect_group_id' => 1,
         ]);
+        $values = ['Excessive Burr',
+            'Coil Width Too Big',
+            'Damaged Coil',
+            'Coil Change / Change Over',
+            'Roll Off',
+            'Roll Up',
+            'Friction Hard/Soft',
+            'Closed Corrugation / tails',
+            'Vuvuzela/pitch to small',
+            'Cutting Length Long/Short',
+            'Bad/Skew Cutting',
+            ];
+        $import_positions = range(34, 54, 2);
+        $this->createDefectType($values,'Interlock',$InterlockFormingGroup->id,$import_positions);
 
-        DefectType::create([
-            'value' => 'Excessive Burr',
-            'component' => 'Interlock',
-            'defect_group_id' => $InterlockFormingGroup->id,
-            'import_pos' => 34
+
+        $values= ['Spot Weld Holes',
+            'Spot Weld high/low Cracks',
+            'Spot Weld Damage'];
+        $import_positions = range(57, 59, 1);
+        $this->createDefectType($values,'Interlock',$InterlockSpotWeldingGroup->id,$import_positions);
+
+        $values=['Damaged','Burn Away'];
+        $import_positions = range(61, 62, 1);
+        $this->createDefectType($values,'Interlock',$InductionHeatingGroup->id,$import_positions);
+
+        $values=["High/Low Ring Position",
+            "Ring cracks/damage rings",
+            "Double Ring / gaps / skew /twisted",
+            "OD too Small/Big",
+            "Tails/ loose wires/ twisted",
+            "Length Short/long",
+            "Closed Corrugation2",
+            "Friction Hard/ soft",
+            "cracks/ holes/dents/edge damage",
+            "Damage/ bad cutting/clamping damage"];
+        $import_positions = range(64, 73, 1);
+        $this->createDefectType($values,'Interlock',$ClampingGroup->id,$import_positions);
+    }
+
+    function knittingGroupSeed() {
+
+        $SupplierKnittingGroup = DefectGroup::create([
+            'value' => 'Knitting Supplier',
+            'component' => 'Knitting'
         ]);
 
-        DefectType::create([
-            'value' => 'Coil Width Too Big',
-            'component' => 'Interlock',
-            'defect_group_id' => $InterlockFormingGroup->id,
-            'import_pos' => 36
+        $values = ["End of load (pcs)",
+            "Bobbin Change"];
+        $this->createDefectType($values,'Knitting',$SupplierKnittingGroup->id,range(31,32,1),1);
+
+
+        $KnittingGroup = DefectGroup::create([
+            'value' => 'Knitting',
+            'component' => 'Knitting'
         ]);
 
-        DefectType::create([
-            'value' => 'Damaged Coil',
-            'component' => 'Interlock',
-            'defect_group_id' => $InterlockFormingGroup->id,
-            'import_pos' => 38
+        $spotWeldingGroup = DefectGroup::create([
+            'value' => 'Spot Welding Knitting',
+            'component' => 'Knitting'
         ]);
 
-        DefectType::create([
-            'value' => 'Coil Change / Change Over',
-            'component' => 'Interlock',
-            'defect_group_id' => $InterlockFormingGroup->id,
-            'import_pos' => 40
+        $values = ["Setup",
+            "extension hard/ soft",
+            "Wire Loops",
+            "Wire Damage/ breakage/ visual",
+            "Mesh length Short/Long",
+            "Damaged Bellow",
+            "Leak in Bellow"];
+        $this->createDefectType($values,'Knitting',$KnittingGroup->id,range(33,39,1));
+
+        $values = ["Burn Through",
+            "Miss Aligned",
+            "Outer braid visual",
+            "Extension high/low",
+            "Wire Beneath Cap"];
+        $this->createDefectType($values,'Knitting',$spotWeldingGroup->id,range(41,45,1));
+    }
+
+    function braidingGroupSeed() {
+        $BraidingGroup = DefectGroup::create([
+            'value' => 'Braiding',
+            'component' => 'Braiding'
         ]);
 
-        DefectType::create([
-            'value' => 'Roll Off',
-            'component' => 'Interlock',
-            'defect_group_id' => $InterlockFormingGroup->id,
-            'import_pos' => 42
+        $spotWeldingGroup = DefectGroup::create([
+            'value' => 'Spot Welding Braiding',
+            'component' => 'Braiding'
         ]);
 
-        DefectType::create([
-            'value' => 'Roll Up',
-            'component' => 'Interlock',
-            'defect_group_id' => $InterlockFormingGroup->id,
-            'import_pos' => 44
+        $values = ["Wire Breakage",
+            "Cut Length Long",
+            "Cut Length Short",
+            "Visual Damage",
+            "Incorrect Angle",
+            "Diameter too Big",
+            "Diameter too Small",
+            "loops /visual braid",
+            "Winding M/C Hard/Soft"];
+        $this->createDefectType($values,'Braiding',$BraidingGroup->id,range(36,44,1));
+        $values = ['IB Length Long/ short/skew',
+            'gaps/loop/ visual parts',
+            'Spot weld burnthrough /  test',
+            'Damage /low/high ring',
+            'Diameter too Big/small'];
+        $this->createDefectType($values,'Braiding',$spotWeldingGroup->id,range(46,50,1));
+    }
+
+    function tubingGroupSeed() {
+        $MaterialGroup = DefectGroup::create([
+            'value' => 'Material',
+            'component' => 'Tubing'
+        ]);
+        $values = ['Uneven Burr (Mat.)',
+            'Wavey/Crinckle Coil',
+            'Chips on coil (Mat.)',
+            'Damaged coil (Mat.)',
+            'Machine stop / start (Mat.)',
+            'Maintenance',
+            'Booster',
+            'Lamination (Mat.)'];
+        $this->createDefectType($values,'Tubing',$MaterialGroup->id,range(30,37,1));
+        $TubingSetupGroup = DefectGroup::create([
+            'value' => 'Setup',
+            'component' => 'Tubing'
         ]);
 
-        DefectType::create([
-            'value' => 'Friction Hard/Soft',
-            'component' => 'Interlock',
-            'defect_group_id' => $InterlockFormingGroup->id,
-            'import_pos' => 46
+        $values= ['Coil Change(Same Product)',
+            'Product Change Over'];
+        $this->createDefectType($values,'Tubing',$TubingSetupGroup->id,range(39,40,1));
+        $WeldingCuttingGroup = DefectGroup::create([
+            'value' => 'Welding Cutting Setting',
+            'component' => 'Tubing'
+        ]);
+        $values= ['Bite and Rope Setting',
+            'Caterpillar Setting/Slippage',
+            'Shaping roller damage',
+            'Machine stop / start(Tea/Lunch)',
+            'Weld oxidation/ torch/settings',
+            'Off centre welding',
+            'Inside welding puncture',
+            'Outside welding puncture',
+            'Pre pierce setting',
+            'Incorrect pre pierce position',
+            'set up settings',
+            'Cutting length defects / bad cutting',
+            'Clamp scratch defects',
+            'Change over settings /ssettings /  bad pipe shape',
+            'Stains'];
+        $this->createDefectType($values,'Tubing',$WeldingCuttingGroup->id,range(42,57,1));
+        $FormingGroup = DefectGroup::create([
+            'value' => 'Forming',
+            'component' => 'Tubing'
         ]);
 
-        DefectType::create([
-            'value' => 'Closed Corrugation / tails',
-            'component' => 'Interlock',
-            'defect_group_id' => $InterlockFormingGroup->id,
-            'import_pos' => 48
+        $values = ['Inserting _ Chip/off cut between ply',
+            'Inserting _ Centring of pipe defects',
+            'Basic Material Puncture',
+            'Bad burr welding pucture',
+            'Projects/ Sample scrap	Leaks _ Forming pressure leak-O-ring',
+            'Leaks _ Inner weld crack',
+            'End Core / Edge Damage	Deformed corrugations',
+            'incorrect centring/inner ply short	Damage by mould closing	Dents',
+            'Piercing Split	Pierce Position	No Piercing'];
+        $this->createDefectType($values,'Tubing',$FormingGroup->id,range(59,73,1));
+        $DefectQtyEndCuttingGroup = DefectGroup::create([
+            'value' => 'Defect QTY End Cutting',
+            'component' => 'Tubing'
         ]);
+        $values = ['Corrugation damage','Bad cutting condition2'];
+        $this->createDefectType($values,'Tubing',$DefectQtyEndCuttingGroup->id,range(75,76,1));
+        $DefectQtyReformingGroup = DefectGroup::create([
+            'value' => 'Defect QTY Reforming',
+            'component' => 'Tubing'
+        ]);
+        $values = ['Bellow dent',
+            'Excessive reforming'];
+        $this->createDefectType($values,'Tubing',$DefectQtyReformingGroup->id,range(78,79,1));
+        $DefectQtyBelowInductionHeatingGroup = DefectGroup::create([
+            'value' => 'Defect QTY Below Induction Heating',
+            'component' => 'Tubing'
+        ]);
+        $values = ['Damage by heating',
+            'Collapsed Bellows',
+            'Collapsed bellows (Mat)'];
+        $this->createDefectType($values,'Tubing',$DefectQtyBelowInductionHeatingGroup->id,range(81,83,1));
+    }
 
-        DefectType::create([
-            'value' => 'Vuvuzela/pitch to small',
-            'component' => 'Interlock',
-            'defect_group_id' => $InterlockFormingGroup->id,
-            'import_pos' => 50
-        ]);
-
-        DefectType::create([
-            'value' => 'Cutting Length Long/Short',
-            'component' => 'Interlock',
-            'defect_group_id' => $InterlockFormingGroup->id,
-            'import_pos' => 52
-        ]);
-
-        DefectType::create([
-            'value' => 'Bad/Skew Cutting',
-            'component' => 'Interlock',
-            'defect_group_id' => $InterlockFormingGroup->id,
-            'import_pos' => 54
-        ]);
-
-        DefectType::create([
-            'value' => 'Spot Weld Holes',
-            'component' => 'Interlock',
-            'defect_group_id' => 1,
-        ]);
-
-        DefectType::create([
-            'value' => 'Spot Weld high/low Cracks',
-            'component' => 'Interlock',
-            'defect_group_id' => 1,
-        ]);
-
-        DefectType::create([
-            'value' => 'Spot Weld Damage',
-            'component' => 'Interlock',
-            'defect_group_id' => 1,
-        ]);
-
-        DefectType::create([
-            'value' => 'Damaged',
-            'component' => 'Interlock',
-            'defect_group_id' => 1,
-        ]);
-
-        DefectType::create([
-            'value' => 'Burn Away',
-            'component' => 'Interlock',
-            'defect_group_id' => 1,
-        ]);
-
-        DefectType::create([
-            'value' => 'High/Low Ring Position',
-            'component' => 'Interlock',
-            'defect_group_id' => 1,
-        ]);
-
-        DefectType::create([
-            'value' => 'Ring cracks/damage rings',
-            'component' => 'Interlock',
-            'defect_group_id' => 1,
-        ]);
-
-        DefectType::create([
-            'value' => 'Double Ring / gaps / skew /twisted',
-            'component' => 'Interlock',
-            'defect_group_id' => 1,
-        ]);
-
-        DefectType::create([
-            'value' => 'OD too Small/Big',
-            'component' => 'Interlock',
-            'defect_group_id' => 1,
-        ]);
-
-        DefectType::create([
-            'value' => 'Tails/ loose wires/ twisted',
-            'component' => 'Interlock',
-            'defect_group_id' => 1,
-        ]);
-
-        DefectType::create([
-            'value' => 'Length Short/long',
-            'component' => 'Interlock',
-            'defect_group_id' => 1,
-        ]);
-
-        DefectType::create([
-            'value' => 'Closed Corrugation2',
-            'component' => 'Interlock',
-            'defect_group_id' => 1,
-        ]);
-
-        DefectType::create([
-            'value' => 'Friction Hard/ soft',
-            'component' => 'Interlock',
-            'defect_group_id' => 1,
-        ]);
-
-        DefectType::create([
-            'value' => 'cracks/ holes/dents/edge damage',
-            'component' => 'Interlock',
-            'defect_group_id' => 1,
-        ]);
-
-        DefectType::create([
-            'value' => 'Damage/ bad cutting/clamping damage',
-            'component' => 'Interlock',
-            'defect_group_id' => 1,
-        ]);
+    function createDefectType($values,$component,$defect_group_id,$import_positions,$is_inc = 0)
+    {
+        for($i=0;$i<count($values);$i++){
+            DefectType::create([
+                'value' => $values[$i],
+                'component' => $component,
+                'defect_group_id' => $defect_group_id,
+                'import_pos' => $import_positions [$i],
+                'is_material_error' => $is_inc
+            ]);
+        }
     }
 }
